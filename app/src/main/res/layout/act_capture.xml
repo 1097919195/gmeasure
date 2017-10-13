@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.npclo.imeasurer.camera.view.ViewfinderView
+    <com.npclo.gdemo.camera.view.ViewfinderView
         android:id="@+id/viewfinderView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

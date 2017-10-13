@@ -6,7 +6,7 @@
     android:background="@color/white"
     android:orientation="horizontal">
 
-    <com.npclo.imeasurer.utils.views.MyTextView
+    <com.npclo.gdemo.utils.views.MyTextView
         android:id="@+id/tv"
         android:layout_width="match_parent"
         android:layout_height="42dp"
