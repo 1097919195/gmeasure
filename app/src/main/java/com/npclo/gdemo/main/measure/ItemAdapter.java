@@ -8,10 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import com.npclo.gdemo.R;
-import com.npclo.gdemo.data.measure.item.parts.Part;
-import com.npclo.gdemo.utils.views.MyTextView;
+import com.npclo.gdemo.data.quality.Part;
 
 import java.util.ArrayList;
 
@@ -42,16 +42,15 @@ public class ItemAdapter extends ArrayAdapter<Part> {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
             convertView = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            holder.textView = (MyTextView) convertView.findViewById(R.id.tv);
+            holder.name = (TextView) convertView.findViewById(R.id.tv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         Part item = mGridData.get(position);
 
-        MyTextView textView = holder.textView;
-        textView.setText(item.getCn());
-        textView.setTag(item.getEn());
+        TextView textView = holder.name;
+        textView.setText(item.getName());
         return convertView;
     }
 
@@ -71,6 +70,7 @@ public class ItemAdapter extends ArrayAdapter<Part> {
     }
 
     private class ViewHolder {
-        MyTextView textView;
+        TextView name;
+        TextView diff;
     }
 }

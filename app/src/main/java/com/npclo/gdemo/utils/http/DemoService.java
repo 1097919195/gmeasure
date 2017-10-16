@@ -13,5 +13,8 @@ import rx.Observable;
 
 public interface DemoService {
     @GET("qc/itemsingle/{id}")
-    Observable<HttpResponse<QualityItem>> getQualityItem(@Path("id") String id);
+    Observable<HttpResponse<QualityItem>> getQualityItemWithId(@Path("id") String id);
+
+    @GET("qc/itemsingle/{code}")
+    Observable<HttpResponse<QualityItem>> getQualityItemWithCode(@Path("code") String code);
 }

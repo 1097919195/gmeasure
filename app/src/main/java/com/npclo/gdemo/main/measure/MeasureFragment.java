@@ -11,8 +11,6 @@ import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -23,12 +21,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.bumptech.glide.Glide;
 import com.npclo.gdemo.R;
 import com.npclo.gdemo.base.BaseFragment;
-import com.npclo.gdemo.data.measure.item.MeasurementItem;
-import com.npclo.gdemo.data.measure.item.parts.Part;
-import com.npclo.gdemo.data.wuser.WechatUser;
 import com.npclo.gdemo.main.MainActivity;
 import com.npclo.gdemo.main.home.HomeFragment;
 import com.npclo.gdemo.main.home.HomePresenter;
@@ -45,7 +39,6 @@ import com.unisound.client.SpeechSynthesizerListener;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -67,8 +60,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     private static final String TAG = MeasureFragment.class.getSimpleName();
     private static final int MY_PERMISSIONS_REQUEST_CAPTURE = 101;
     private static final int MY_PERMISSIONS_REQUEST_CHOOSE = 102;
-    @BindView(R.id.base_toolbar_title)
-    TextView baseToolbarTitle;
     @BindView(R.id.base_toolbar)
     Toolbar baseToolbar;
     @BindView(R.id.wechat_icon)
@@ -155,8 +146,8 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         initToolbar();
         //渲染测量部位列表
         initMeasureItemList();
-        ItemAdapter adapter = new ItemAdapter(getActivity(), R.layout.list_measure_item, (ArrayList<Part>) partList);
-        gridView.setAdapter(adapter);// TODO: 2017/9/4 使用RecyclerView替代
+//        ItemAdapter adapter = new ItemAdapter(getActivity(), R.layout.item_qc, (ArrayList<Part>) partList);
+//        gridView.setAdapter(adapter);// TODO: 2017/9/4 使用RecyclerView替代
         // FIXME: 2017/9/8 notifyItemChanged 部分绑定
         gridView.setOnItemClickListener((AdapterView<?> var1, View view, int position, long var4) -> {
             resetTextViewClickState();
@@ -191,7 +182,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     }
 
     private void initToolbar() {
-        baseToolbarTitle.setText("量体");
         baseToolbar.setNavigationIcon(R.mipmap.left);
         baseToolbar.setNavigationOnClickListener(__ -> {
             HomeFragment homeFragment = HomeFragment.newInstance();
@@ -278,27 +268,27 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     }
 
     private void initMeasureItemList() {
-        try {
-            MeasurementItem item = (MeasurementItem) Class.forName(ITEM_PACKAGE + ".MeasurementItem").newInstance();
-            Field[] declaredFields = item.getClass().getDeclaredFields();
-            List<String> nameList = new ArrayList<>();
-            for (Field field : declaredFields) {
-                String name = field.getName();
-                nameList.add(name);
-            }
-
-            String[] objects = new String[nameList.size()];
-            String[] strings = nameList.toArray(objects);
-            Arrays.sort(strings);
-            //att 循环添加单行
-            for (String name : strings) {
-                Class<?> itemSubclass = Class.forName(PART_PACKAGE + "." + name);
-                Part part = (Part) itemSubclass.newInstance();
-                partList.add(new Part(part.getCn(), part.getEn()));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            MeasurementItem item = (MeasurementItem) Class.forName(ITEM_PACKAGE + ".MeasurementItem").newInstance();
+//            Field[] declaredFields = item.getClass().getDeclaredFields();
+//            List<String> nameList = new ArrayList<>();
+//            for (Field field : declaredFields) {
+//                String name = field.getName();
+//                nameList.add(name);
+//            }
+//
+//            String[] objects = new String[nameList.size()];
+//            String[] strings = nameList.toArray(objects);
+//            Arrays.sort(strings);
+//            //att 循环添加单行
+//            for (String name : strings) {
+//                Class<?> itemSubclass = Class.forName(PART_PACKAGE + "." + name);
+//                Part part = (Part) itemSubclass.newInstance();
+//                partList.add(new Part(part.getCn(), part.getEn()));
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -420,8 +410,8 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         String tag = (String) textView.getTag();
         String cn;
         try {
-            Part part = (Part) Class.forName(PART_PACKAGE + "." + tag).newInstance();
-            cn = part.getCn();
+//            Part part = (Part) Class.forName(PART_PACKAGE + "." + tag).newInstance();
+//            cn = part.getCn();
             String value;//播报的测量结果
             if (angleList.contains(tag)) {
                 //按要求赋值
@@ -441,18 +431,18 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
             String result;//播报当前测量结果
             String[] strings = getNextString(type);
             if (type == 1) { //修改原有结果
-                result = cn + value;
+//                result = cn + value;
                 modifyingView = null;//att 重置待修改项
             } else { //按顺序测量
-                result = cn + value;
+//                result = cn + value;
                 unMeasuredList.remove(0);//att 最前的一项测量完毕
             }
             if (!TextUtils.isEmpty(strings[0])) {
-                s = result + "        请测" + strings[0];
+//                s = result + "        请测" + strings[0];
                 popup_content_tv.setText(strings[0]);
             }
             if (!TextUtils.isEmpty(strings[1])) {
-                s = result + strings[1];
+//                s = result + strings[1];
                 popup_content_tv.setText(strings[1]);
             }
             speechSynthesizer.playText(s);

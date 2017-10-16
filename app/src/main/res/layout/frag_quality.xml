@@ -20,71 +20,95 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:paddingTop="5dp"
+                android:orientation="horizontal"
                 android:paddingBottom="5dp"
-                android:orientation="horizontal">
+                android:paddingTop="5dp">
 
                 <android.support.v7.widget.AppCompatTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginStart="20dp"
-                    android:textColor="@color/c333"
-                    android:text="设备名称：" />
+                    android:layout_weight="1"
+                    android:text="设备名称："
+                    android:textColor="@color/c333" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/de_name"
                     android:layout_width="0dp"
-                    android:textColor="@color/primary"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:textColor="@color/primary" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="@color/c333"
-                    android:text="电量：" />
+                    android:text="电量："
+                    android:textColor="@color/c333" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/de_battery"
                     android:layout_width="0dp"
-                    android:textColor="@color/primary"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:textColor="@color/primary" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
                 android:background="@color/white"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/qu_type"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginStart="20dp"
-                    android:textColor="@color/ff5001"
-                    android:text="类型" />
+                    android:layout_weight="1"
+                    android:text="类型"
+                    android:textColor="@color/ff5001" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:textColor="@color/c333"
-                    android:text="订单编号：" />
+                    android:text="订单编号："
+                    android:textColor="@color/c333" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/qu_num"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
-                    android:textColor="@color/primary"
-                    android:text="12345678" />
+                    android:text="12345678"
+                    android:textColor="@color/primary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/linelayout"
+                    android:text="质检部位"
+                    android:textAlignment="center"
+                    android:textColor="@color/primary" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/linelayout"
+                    android:text="偏差"
+                    android:textAlignment="center"
+                    android:textColor="@color/ff0000" />
             </LinearLayout>
 
             <include layout="@layout/view_mygridview" />

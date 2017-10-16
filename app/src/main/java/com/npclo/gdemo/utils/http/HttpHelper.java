@@ -34,7 +34,7 @@ public class HttpHelper {
         //手动创建一个OkHttpClient并设置超时时间
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
-        initHeader(httpClientBuilder);
+//        initHeader(httpClientBuilder);
         retrofit = new Retrofit.Builder()
                 .client(httpClientBuilder.build())
                 .addConverterFactory(GsonConverterFactory.create())

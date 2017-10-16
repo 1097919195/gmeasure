@@ -3,6 +3,7 @@ package com.npclo.gdemo.main.home;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,9 +14,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.npclo.gdemo.R;
 import com.npclo.gdemo.base.BaseFragment;
 import com.npclo.gdemo.camera.CaptureActivity;
-import com.npclo.gdemo.data.ble.BleDevice;
+import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.main.MainActivity;
-import com.npclo.imeasurer.data.BleDevice;
+import com.npclo.gdemo.data.BleDevice;
+import com.npclo.gdemo.main.quality.QualityFragment;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleScanException;
@@ -296,6 +298,18 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void handleQualityItemResult(QualityItem item) {
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("item", item);
+            setArguments(bundle);
+            start(QualityFragment.newInstance(), SINGLETASK);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

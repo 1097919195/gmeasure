@@ -2,6 +2,7 @@ package com.npclo.gdemo.main.home;
 
 import com.npclo.gdemo.base.BasePresenter;
 import com.npclo.gdemo.base.BaseView;
+import com.npclo.gdemo.data.quality.QualityItem;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleScanException;
@@ -45,5 +46,9 @@ public interface HomeContract {
         void closeScanResultDialog();
 
         void setNotificationInfo(UUID characteristicUUID, Observable<RxBleConnection> connectionObservable);
+
+        void handleError(Throwable e);
+
+        void handleQualityItemResult(QualityItem item);
     }
 }

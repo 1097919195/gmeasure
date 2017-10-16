@@ -168,13 +168,19 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void getQualityItemInfoWithId(String id) {
-        new DemoHelper().getQualityItem(id)
+        Subscription subscribe = new DemoHelper().getQualityItemWithId(id)
                 .subscribeOn(mSchedulerProvider.io())
-                .subscribe(item -> fragment.handleQualityItemResult(item), e -> fragment.han);
+                .observeOn(mSchedulerProvider.ui())
+                .subscribe(
+                        item -> fragment.handleQualityItemResult(item), e -> fragment.handleError(e));
+        mSubscription.add(subscribe);
     }
 
     @Override
-    public void getQualityItemInfoWithCode(String result) {
-
+    public void getQualityItemInfoWithCode(String code) {
+        Subscription subscribe = new DemoHelper().getQualityItemWithCode(code)
+                .subscribeOn(mSchedulerProvider.io())
+                .subscribe(item -> fragment.handleQualityItemResult(item), e -> fragment.handleError(e));
+        mSubscription.add(subscribe);
     }
 }

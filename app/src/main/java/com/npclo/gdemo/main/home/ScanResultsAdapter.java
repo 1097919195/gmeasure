@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.npclo.gdemo.R;
-import com.npclo.gdemo.data.ble.BleDevice;
+import com.npclo.gdemo.data.BleDevice;
 
 import java.util.List;
 import java.util.Locale;

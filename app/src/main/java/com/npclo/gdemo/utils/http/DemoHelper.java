@@ -5,12 +5,16 @@ import com.npclo.gdemo.data.quality.QualityItem;
 
 import rx.Observable;
 
-import static android.R.attr.id;
-
 public class DemoHelper extends HttpHelper {
-    public Observable<QualityItem> getQualityItem(String id) {
+    public Observable<QualityItem> getQualityItemWithId(String id) {
         return retrofit.create(DemoService.class)
-                .getQualityItem(id)
+                .getQualityItemWithId(id)
+                .map(new HttpResponseFunc<>());
+    }
+
+    public Observable<QualityItem> getQualityItemWithCode(String code) {
+        return retrofit.create(DemoService.class)
+                .getQualityItemWithCode(code)
                 .map(new HttpResponseFunc<>());
     }
 }
