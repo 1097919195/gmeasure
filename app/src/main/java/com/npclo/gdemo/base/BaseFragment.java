@@ -19,7 +19,6 @@ import java.net.SocketTimeoutException;
 
 import me.yokeyword.fragmentation.SupportFragment;
 import retrofit2.HttpException;
-import util.UpdateAppUtils;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 

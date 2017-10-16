@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.NonNull;
 
+import com.npclo.gdemo.utils.http.DemoHelper;
 import com.npclo.gdemo.utils.schedulers.BaseSchedulerProvider;
 import com.polidea.rxandroidble.RxBleClient;
 import com.polidea.rxandroidble.RxBleConnection;
@@ -32,8 +33,6 @@ public class HomePresenter implements HomeContract.Presenter {
     @NonNull
     private HomeFragment fragment;
     @NonNull
-    private CompositeSubscription mSubscriptions;
-    @NonNull
     private BaseSchedulerProvider mSchedulerProvider;
     @NonNull
     private RxBleClient rxBleClient;
@@ -45,10 +44,11 @@ public class HomePresenter implements HomeContract.Presenter {
     private Observable<RxBleConnection> connectionObservable;
     private Subscription scanSubscribe;
 
-    public HomePresenter(@NonNull HomeContract.View view, @NonNull BaseSchedulerProvider schedulerProvider) {
+    public HomePresenter(@NonNull RxBleClient client, @NonNull HomeContract.View view, @NonNull BaseSchedulerProvider schedulerProvider) {
+        rxBleClient = checkNotNull(client);
         fragment = ((HomeFragment) checkNotNull(view));
         mSchedulerProvider = checkNotNull(schedulerProvider);
-        mSubscriptions = new CompositeSubscription();
+        mSubscription = new CompositeSubscription();
         fragment.setPresenter(this);
     }
 
@@ -58,7 +58,7 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void unsubscribe() {
-        mSubscriptions.clear();
+        mSubscription.clear();
     }
 
     private Observable<RxBleConnection> prepareConnectionObservable() {
@@ -164,5 +164,17 @@ public class HomePresenter implements HomeContract.Presenter {
 
     private void scanning() {
         fragment.showScanning();
+    }
+
+    @Override
+    public void getQualityItemInfoWithId(String id) {
+        new DemoHelper().getQualityItem(id)
+                .subscribeOn(mSchedulerProvider.io())
+                .subscribe(item -> fragment.handleQualityItemResult(item), e -> fragment.han);
+    }
+
+    @Override
+    public void getQualityItemInfoWithCode(String result) {
+
     }
 }

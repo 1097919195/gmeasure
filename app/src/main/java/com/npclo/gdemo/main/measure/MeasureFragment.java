@@ -25,11 +25,11 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.npclo.gdemo.R;
-import com.npclo.gdemo.base.BaseApplication;
 import com.npclo.gdemo.base.BaseFragment;
 import com.npclo.gdemo.data.measure.item.MeasurementItem;
 import com.npclo.gdemo.data.measure.item.parts.Part;
 import com.npclo.gdemo.data.wuser.WechatUser;
+import com.npclo.gdemo.main.MainActivity;
 import com.npclo.gdemo.main.home.HomeFragment;
 import com.npclo.gdemo.main.home.HomePresenter;
 import com.npclo.gdemo.utils.BitmapUtils;
@@ -113,10 +113,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @BindView(R.id.imageView2)
     ImageView imageView2;
     private MeasureContract.Presenter measurePresenter;
-    private WechatUser user;
     private SpeechSynthesizer speechSynthesizer;
-    private String PART_PACKAGE = Part.class.getPackage().getName();
-    private String ITEM_PACKAGE = MeasurementItem.class.getPackage().getName();
     private MaterialDialog saveProgressbar;
     public static final int TAKE_PHOTO = 13;
     public static final int CROP_PHOTO = 14;
@@ -125,7 +122,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     private List<FrameLayout> unVisibleView = new ArrayList<>();
     private List<MyTextView> unMeasuredList = new ArrayList<>();
     private List<String> angleList;
-    private List<Part> partList = new ArrayList<>();
     private MyTextView modifyingView;
     private boolean initUmMeasureListFlag;
     private Uri imageUri;
@@ -151,13 +147,11 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     protected void afterCreate(Bundle savedInstanceState) {
         super.afterCreate(savedInstanceState);
         Bundle bundle = getArguments();
-        user = bundle.getParcelable("user");
     }
 
     @Override
     protected void initView(View mRootView) {
         unbinder = ButterKnife.bind(this, mRootView);
-        initPopupWindow();
         initToolbar();
         //渲染测量部位列表
         initMeasureItemList();
@@ -184,19 +178,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
 
     }
 
-    private void initPopupWindow() {
-        if (popupWindow == null) {
-            popupWindow = new PopupWindow(getActivity());
-            popupWindow.setWidth(Toolbar.LayoutParams.MATCH_PARENT);
-            popupWindow.setHeight(Toolbar.LayoutParams.WRAP_CONTENT);
-            View popup_content = LayoutInflater.from(getActivity()).inflate(R.layout.view_popupwindow, null);
-            popupWindow.setContentView(popup_content);
-            popup_content_tv = (AppCompatTextView) popup_content.findViewById(R.id.tv_item);
-            popupWindow.setFocusable(false);
-            popupWindow.showAtLocation(mRootView, Gravity.CENTER, 0, 0);
-        }
-    }
-
     // FIXME: 2017/9/8 遍历 更好的方式
     //att 针对误点击进行修改操作，重置所有的处于修改状态的textview为非修改状态
     private void resetTextViewClickState() {
@@ -215,7 +196,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         baseToolbar.setNavigationOnClickListener(__ -> {
             HomeFragment homeFragment = HomeFragment.newInstance();
             start(homeFragment, SINGLETASK);
-            homeFragment.setPresenter(new HomePresenter(homeFragment, SchedulerProvider.getInstance()));
+            homeFragment.setPresenter(new HomePresenter(((MainActivity) getActivity()).getRxBleClient(), homeFragment, SchedulerProvider.getInstance()));
         });
         baseToolbar.inflateMenu(R.menu.base_toolbar_menu);
         baseToolbar.getMenu().getItem(0).setIcon(R.mipmap.battery_unknown);
@@ -224,25 +205,18 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @Override
     public void onResume() {
         super.onResume();
-        try {
-            wechatNickname.setText(user.getNickname());
-            wechatGender.setText(user.getGender() == 1 ? "男" : "女");
-//            wechatName.setText("微信号：" + user.getName());
-            Glide.with(this).load(user.getAvatar()).into(wechatIcon);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         initSpeech();
         measurePresenter.subscribe();
         String[] angleItems = getResources().getStringArray(R.array.angle_items);
         angleList = Arrays.asList(angleItems);
         try {
-            RxBleDevice bleDevice = BaseApplication.getRxBleDevice(getActivity());
+            MainActivity activity = ((MainActivity) getActivity());
+            RxBleDevice bleDevice = activity.getRxBleDevice();
             if (bleDevice != null && bleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
                 //启动测量
 
-                UUID characteristicUUID = BaseApplication.getUUID(getActivity());
-                Observable<RxBleConnection> connectionObservable = BaseApplication.getConnection(getActivity());
+                UUID characteristicUUID = activity.getCharacteristicUUID();
+                Observable<RxBleConnection> connectionObservable = activity.getConnectionObservable();
                 measurePresenter.startMeasure(characteristicUUID, connectionObservable);
             }
         } catch (Exception e) {

@@ -16,6 +16,10 @@ public interface HomeContract {
         void connectDevice(String s);
 
         void startScan();
+
+        void getQualityItemInfoWithId(String result);
+
+        void getQualityItemInfoWithCode(String result);
     }
 
     interface View extends BaseView<Presenter> {

@@ -1,6 +1,9 @@
 package com.npclo.gdemo.main.home;
 
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
@@ -8,17 +11,15 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.npclo.gdemo.R;
-import com.npclo.gdemo.base.BaseApplication;
 import com.npclo.gdemo.base.BaseFragment;
 import com.npclo.gdemo.camera.CaptureActivity;
 import com.npclo.gdemo.data.ble.BleDevice;
+import com.npclo.gdemo.main.MainActivity;
+import com.npclo.imeasurer.data.BleDevice;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.scan.ScanResult;
-import com.unisound.client.SpeechConstants;
-import com.unisound.client.SpeechSynthesizer;
-import com.unisound.client.SpeechSynthesizerListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import rx.Observable;
 
@@ -35,6 +37,12 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     public static final int REQUEST_CODE = 1001;
     @BindView(R.id.base_toolbar)
     Toolbar toolbarBase;
+    @BindView(R.id.btn_ble)
+    AppCompatButton btnBle;
+    @BindView(R.id.btn_measure)
+    AppCompatButton btnMeasure;
+    @BindView(R.id.btn_quality)
+    AppCompatButton btnQuality;
     Unbinder unbinder;
     private static final String TAG = HomeFragment.class.getSimpleName();
     private HomeContract.Presenter mPresenter;
@@ -47,7 +55,6 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     private MaterialDialog.Builder scanResultDialog;
     private MaterialDialog connectingProgressBar;
     private MaterialDialog scanningProgressBar;
-    private SpeechSynthesizer speechSynthesizer;
     private MaterialDialog resultDialog;
 
     public static HomeFragment newInstance() {
@@ -63,6 +70,17 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     protected void initView(View mRootView) {
         unbinder = ButterKnife.bind(this, mRootView);
         initToolbar();
+        configureResultList();
+        initBleState();
+    }
+
+    private void initBleState() {
+        RxBleDevice rxBleDevice = ((MainActivity) getActivity()).getRxBleDevice();
+        if (rxBleDevice != null && rxBleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
+            toolbarBase.getMenu().getItem(0).setIcon(R.drawable.ble_connected);
+            btnBle.setText(getString(R.string.connected));
+            btnBle.setEnabled(false);
+        }
     }
 
     @Override
@@ -76,25 +94,13 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         unbinder.unbind();
     }
 
-    private void startScan() {
-        Intent intent = new Intent(getActivity(), CaptureActivity.class);
-        startActivityForResult(intent, REQUEST_CODE);
-    }
-
     /**
      * 初始化toolbar的一些默认属性
      */
     protected void initToolbar() {
         toolbarBase.setTitleTextColor(getResources().getColor(R.color.toolbar_text));//设置主标题颜色
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (BaseApplication.getFirstCheckHint(getActivity())) {
-            BaseApplication.setIsFirstCheck(getActivity());
-        }
+        toolbarBase.inflateMenu(R.menu.base_toolbar_menu);
+        toolbarBase.getMenu().getItem(0).setIcon(R.drawable.ble_disconnected);
     }
 
     @Override
@@ -123,33 +129,13 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
                 .titleColor(getResources().getColor(R.color.scan_result_list_title))
                 .dividerColor(getResources().getColor(R.color.divider))
                 .adapter(scanResultsAdapter, null);
-        ;
+
         //选择目的蓝牙设备
         scanResultsAdapter.setOnAdapterItemClickListener(v -> {
                     String s = ((TextView) v.findViewById(R.id.txt_mac)).getText().toString();
                     mPresenter.connectDevice(s);
                 }
         );
-    }
-
-    private void initSpeech() {
-        String APPKEY = "hhzjkm3l5akcz5oiflyzmmmitzrhmsfd73lyl3y2";
-        String APPSECRET = "29aa998c451d64d9334269546a4021b8";
-        if (speechSynthesizer == null)
-            speechSynthesizer = new SpeechSynthesizer(getActivity(), APPKEY, APPSECRET);
-        speechSynthesizer.setOption(SpeechConstants.TTS_SERVICE_MODE, SpeechConstants.TTS_SERVICE_MODE_NET);
-        speechSynthesizer.setTTSListener(new SpeechSynthesizerListener() {
-            @Override
-            public void onEvent(int i) {
-
-            }
-
-            @Override
-            public void onError(int i, String s) {
-
-            }
-        });
-        speechSynthesizer.init(null);// FIXME: 2017/8/24 语音播报需要联网
     }
 
     public void handleBleScanException(BleScanException bleScanException) {
@@ -216,6 +202,11 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     }
 
     @Override
+    public void handleError(Throwable e) {
+        handleError(e, TAG);
+    }
+
+    @Override
     public void showError() {
         showToast(getString(R.string.unKnownError));
     }
@@ -224,14 +215,17 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     public void showConnected(RxBleDevice bleDevice) {
         connectingProgressBar.dismiss();
         showToast(getString(R.string.device_connected));
-        speechSynthesizer.playText("蓝牙连接成功");
-        BaseApplication.setRxBleDevice(getActivity(), bleDevice);
+        ((MainActivity) getActivity()).speechSynthesizer.playText("蓝牙连接成功");
+        ((MainActivity) getActivity()).setRxBleDevice(bleDevice);
+        toolbarBase.getMenu().getItem(0).setIcon(R.drawable.ble_connected);
+        btnBle.setText(getString(R.string.connected));
+        btnBle.setEnabled(false);
     }
-
 
     @Override
     public void setNotificationInfo(UUID characteristicUUID, Observable<RxBleConnection> connectionObservable) {
-        BaseApplication.setNotificationInfo(getActivity(), characteristicUUID, connectionObservable);
+        ((MainActivity) getActivity()).setCharacteristicUUID(characteristicUUID);
+        ((MainActivity) getActivity()).setConnectionObservable(connectionObservable);
     }
 
     @Override
@@ -266,6 +260,42 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @OnClick({R.id.btn_ble, R.id.btn_quality, R.id.btn_measure})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_ble:
+                BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (!defaultAdapter.isEnabled()) {
+                    new MaterialDialog.Builder(getActivity())
+                            .content(getString(R.string.can_open_ble))
+                            .positiveText(getString(R.string.open))
+                            .negativeText(getString(R.string.cancel))
+                            .backgroundColor(getResources().getColor(R.color.white))
+                            .contentColor(getResources().getColor(R.color.primary))
+                            .onPositive((dialog, which) -> defaultAdapter.enable())
+                            .show();
+                }
+                ((MainActivity) getActivity()).getRxPermissions()
+                        .request(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        .subscribe(grant -> {
+                            if (grant) {
+                                mPresenter.startScan();
+                            } else {
+                                showToast(getString(R.string.unauthorized_location));
+                            }
+                        });
+                break;
+            case R.id.btn_measure:
+                break;
+            case R.id.btn_quality:
+                Intent intent = new Intent(getActivity(), CaptureActivity.class);
+                startActivityForResult(intent, 1001);
+                break;
+            default:
+                break;
         }
     }
 }
