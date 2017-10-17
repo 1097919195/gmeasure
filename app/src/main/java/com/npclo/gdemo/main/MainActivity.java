@@ -21,13 +21,7 @@ import java.util.UUID;
 
 import rx.Observable;
 
-/**
- * Created by Endless on 2017/9/1.
- */
-
 public class MainActivity extends BaseActivity {
-    private static final int SCAN_HINT = 1001;
-    private static final int CODE_HINT = 1002;
     private RxPermissions rxPermissions;
     private RxBleDevice rxBleDevice;
     private UUID characteristicUUID;
@@ -43,13 +37,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void init() {
-//        PermissionGen.with(MainActivity.this)
-//                .addRequestCode(100)
-//                .permissions(
-//                        Manifest.permission_group.LOCATION,
-//                        Manifest.permission_group.STORAGE,
-//                        Manifest.permission_group.CAMERA)
-//                .request();
         rxPermissions = new RxPermissions(this);
         rxBleClient = RxBleClient.create(this);
         initSpeech();
@@ -117,5 +104,11 @@ public class MainActivity extends BaseActivity {
             }
         });
         speechSynthesizer.init(null);// FIXME: 2017/8/24 语音播报需要联网
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        speechSynthesizer = null;
     }
 }

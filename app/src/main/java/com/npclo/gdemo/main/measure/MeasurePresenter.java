@@ -45,9 +45,7 @@ public class MeasurePresenter implements MeasureContract.Presenter {
         Subscription subscribe = connectionObservable
                 .flatMap(rxBleConnection -> rxBleConnection.setupNotification(characteristicUUID))
                 .flatMap(notificationObservable -> notificationObservable)
-                .doOnSubscribe(() -> fragment.bleDeviceMeasuring())
                 .observeOn(schedulerProvider.ui())
-                .doOnNext(notificationObservable -> fragment.showStartReceiveData())
                 .subscribe(this::handleBleResult, this::handleError);
         mSubscriptions.add(subscribe);
     }

@@ -16,7 +16,6 @@ import rx.subscriptions.CompositeSubscription;
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
 public class QualityPresenter implements QualityContract.Presenter {
-    private static final String TAG = QualityPresenter.class.getSimpleName();
     @NonNull
     private CompositeSubscription mSubscription;
     @NonNull

@@ -10,24 +10,28 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.npclo.gdemo.R;
-import com.npclo.gdemo.data.quality.Part;
 import com.npclo.gdemo.utils.views.MyTextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ItemAdapter extends ArrayAdapter<Part> {
+/**
+ * Created by Endless on 2017/10/17.
+ */
+
+class ItemAdapter2 extends ArrayAdapter<String> {
     private Context mContext;
     private int layoutResourceId;
-    private ArrayList<Part> mGridData = new ArrayList<>();
+    private List<String> mGridData = new ArrayList<>();
 
-    public ItemAdapter(@NonNull Context context, @LayoutRes int resource, ArrayList<Part> objects) {
+    public ItemAdapter2(@NonNull Context context, @LayoutRes int resource, List<String> objects) {
         super(context, resource);
         this.mContext = context;
         this.layoutResourceId = resource;
         this.mGridData = objects;
     }
 
-    public void setGridData(ArrayList<Part> mGridData) {
+    public void setGridData(ArrayList<String> mGridData) {
         this.mGridData = mGridData;
         notifyDataSetChanged();
     }
@@ -41,16 +45,15 @@ public class ItemAdapter extends ArrayAdapter<Part> {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
             convertView = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            holder.name = (MyTextView) convertView.findViewById(R.id.tv);
+            holder.name = (MyTextView) convertView.findViewById(R.id.name);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        Part item = mGridData.get(position);
+        String s = mGridData.get(position);
 
         MyTextView textView = holder.name;
-        textView.setText(item.getName());
-        textView.setValue(item.getValue() + "");
+        textView.setText(s);
         return convertView;
     }
 
@@ -60,7 +63,7 @@ public class ItemAdapter extends ArrayAdapter<Part> {
     }
 
     @Override
-    public Part getItem(int position) {
+    public String getItem(int position) {
         return mGridData.get(position);
     }
 

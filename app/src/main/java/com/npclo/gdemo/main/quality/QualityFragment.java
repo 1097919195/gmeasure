@@ -36,7 +36,6 @@ import rx.Observable;
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
 public class QualityFragment extends BaseFragment implements QualityContract.View {
-    private static final String TAG = QualityFragment.class.getSimpleName();
     private static final int SCAN_HINT = 1001;
     private static final int CODE_HINT = 1002;
     @BindView(R.id.de_name)
@@ -144,7 +143,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
 
     @Override
     public void handleError(Throwable e) {
-        handleError(e, TAG);
+        handleError(e);
     }
 
     @Override

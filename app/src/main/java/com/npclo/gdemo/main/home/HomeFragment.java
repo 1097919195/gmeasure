@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +17,8 @@ import com.npclo.gdemo.camera.CaptureActivity;
 import com.npclo.gdemo.data.BleDevice;
 import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.main.MainActivity;
+import com.npclo.gdemo.main.measure.MeasureFragment;
+import com.npclo.gdemo.main.measure.MeasurePresenter;
 import com.npclo.gdemo.main.quality.QualityFragment;
 import com.npclo.gdemo.main.quality.QualityPresenter;
 import com.npclo.gdemo.utils.schedulers.SchedulerProvider;
@@ -207,7 +208,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     @Override
     public void handleError(Throwable e) {
-        handleError(e, TAG);
+        super.handleError(e);
     }
 
     @Override
@@ -293,6 +294,9 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
                         });
                 break;
             case R.id.btn_measure:
+                MeasureFragment fragment = MeasureFragment.newInstance();
+                fragment.setPresenter(new MeasurePresenter(fragment, SchedulerProvider.getInstance()));
+                start(fragment);
                 break;
             case R.id.btn_quality:
                 Intent intent = new Intent(getActivity(), CaptureActivity.class);

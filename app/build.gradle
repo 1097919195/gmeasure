@@ -79,7 +79,6 @@ dependencies {
     compile 'com.blankj:utilcode:1.9.0'
     compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
-    compile files('src/main/lib/AMap_Location_V3.6.0_20170918.jar')
 }
 
 configurations.all {

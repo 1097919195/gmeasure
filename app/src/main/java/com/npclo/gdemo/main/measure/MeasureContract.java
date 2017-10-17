@@ -14,22 +14,9 @@ import rx.Observable;
 
 public interface MeasureContract {
     interface View extends BaseView<Presenter> {
-
         void handleError(Throwable e);
 
-        void showStartReceiveData();
-
-        void bleDeviceMeasuring();
-
         void handleMeasureData(float v, float a2, int a3);
-
-        void showSuccessSave();
-
-        void showSaveError(Throwable e);
-
-        void showSaveCompleted();
-
-        void showLoading(boolean b);
     }
 
     interface Presenter extends BasePresenter {

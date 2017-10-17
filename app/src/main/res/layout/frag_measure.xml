@@ -7,7 +7,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -17,39 +18,110 @@
 
             <include layout="@layout/base_toolbar" />
 
-            <include layout="@layout/view_wechat_user_info" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="horizontal"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="设备名称:"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/c252527"
+                    android:textSize="16sp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/de_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/primary"
+                    android:textSize="16sp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="电量:"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/c252527"
+                    android:textSize="16sp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/de_battery"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/ff5001"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/white">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@drawable/grid_bg"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:text="部位"
+                    android:textAlignment="center"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@drawable/grid_bg"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:text="长度"
+                    android:textAlignment="center"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@drawable/grid_bg"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:text="角度"
+                    android:textAlignment="center"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
             <include layout="@layout/view_mygridview" />
 
-            <include layout="@layout/view_camera_user" />
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_clear"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_radius_solid_primary"
+                android:text="清除"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
         </LinearLayout>
     </ScrollView>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="48dp">
-        <!--TODO 修改这种布局-->
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/save_measure_result"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_gravity="bottom"
-            android:background="@color/primary"
-            android:text="@string/save_measure_result"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/next_person"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_gravity="bottom"
-            android:background="@color/primary"
-            android:text="@string/next_person"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:visibility="invisible" />
-    </FrameLayout>
 </LinearLayout>

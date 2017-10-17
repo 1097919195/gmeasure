@@ -66,7 +66,7 @@ public abstract class BaseFragment extends SupportFragment {
      * @param e
      * @param TAG
      */
-    protected void handleError(Throwable e, String TAG) {
+    protected void handleError(Throwable e) {
         if (e instanceof SocketTimeoutException) {
             showToast(getString(R.string.net_connect_timeout));
         } else if (e instanceof ConnectException) {
