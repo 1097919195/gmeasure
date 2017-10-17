@@ -143,7 +143,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
 
     @Override
     public void handleError(Throwable e) {
-        handleError(e);
+        super.handleError(e);
     }
 
     @Override
