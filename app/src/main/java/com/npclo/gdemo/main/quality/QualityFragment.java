@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.npclo.gdemo.R;
 import com.npclo.gdemo.base.BaseFragment;
 import com.npclo.gdemo.camera.CaptureActivity;
@@ -17,7 +16,6 @@ import com.npclo.gdemo.data.quality.Part;
 import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.main.MainActivity;
 import com.npclo.gdemo.main.measure.ItemAdapter;
-import com.npclo.gdemo.utils.Gog;
 import com.npclo.gdemo.utils.MeasureStateEnum;
 import com.npclo.gdemo.utils.views.MyGridView;
 import com.npclo.gdemo.utils.views.MyLineLayout;
@@ -99,11 +97,6 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
 
         Bundle bundle = getArguments();
         QualityItem item = bundle.getParcelable("item");
-        try {
-            Gog.lod(item.getCategory());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         afterResume(item);
     }
 
