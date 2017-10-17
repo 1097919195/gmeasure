@@ -365,7 +365,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
             MyTextView textView = (MyTextView) linearLayout.getChildAt(0);
             textView.setState(MeasureStateEnum.UNMEASUED.ordinal());
             textView.setTextColor(getResources().getColor(R.color.unmeasured));
-            textView.setValue(0.0f);
+            textView.setValue("");
         }
         frame_1.setVisibility(View.INVISIBLE);
         frame_2.setVisibility(View.INVISIBLE);
@@ -419,10 +419,10 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                 //                    speechSynthesizer.playText(cn + "测量结果有误，请重新测量");
                 //                    return;
                 //                } //att 这块容易出现错误，角度出现不准的情况
-                textView.setValue(angle);
+                textView.setValue(angle + "");
                 value = angle + "";
             } else {
-                textView.setValue(length);
+                textView.setValue(length + "");
                 value = length + "";
             }
             textView.setState(MeasureStateEnum.MEASURED.ordinal());//更新状态

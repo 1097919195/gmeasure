@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,10 +15,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.npclo.gdemo.R;
 import com.npclo.gdemo.base.BaseFragment;
 import com.npclo.gdemo.camera.CaptureActivity;
+import com.npclo.gdemo.data.BleDevice;
 import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.main.MainActivity;
-import com.npclo.gdemo.data.BleDevice;
 import com.npclo.gdemo.main.quality.QualityFragment;
+import com.npclo.gdemo.main.quality.QualityPresenter;
+import com.npclo.gdemo.utils.schedulers.SchedulerProvider;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleScanException;
@@ -36,7 +39,6 @@ import rx.Observable;
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
 public class HomeFragment extends BaseFragment implements HomeContract.View {
-    public static final int REQUEST_CODE = 1001;
     @BindView(R.id.base_toolbar)
     Toolbar toolbarBase;
     @BindView(R.id.btn_ble)
@@ -303,13 +305,39 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     @Override
     public void handleQualityItemResult(QualityItem item) {
+        QualityFragment qualityFragment = QualityFragment.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("item", item);
+        qualityFragment.setArguments(bundle);
+        qualityFragment.setPresenter(new QualityPresenter(qualityFragment, SchedulerProvider.getInstance()));
+        start(qualityFragment);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String result = null;
         try {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("item", item);
-            setArguments(bundle);
-            start(QualityFragment.newInstance(), SINGLETASK);
+            Bundle bundle = data.getExtras();
+            result = bundle.getString("result");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        switch (resultCode) {
+            case SCAN_HINT:
+                if (result != null) {
+                    mPresenter.getQualityItemInfoWithId(result);
+                } else {
+                    showToast(getString(R.string.scan_qrcode_failed));
+                }
+                break;
+            case CODE_HINT:
+                if (result != null) {
+                    mPresenter.getQualityItemInfoWithCode(result);
+                } else {
+                    showToast(getString(R.string.enter_qrcode_error));
+                }
+                break;
         }
     }
 }

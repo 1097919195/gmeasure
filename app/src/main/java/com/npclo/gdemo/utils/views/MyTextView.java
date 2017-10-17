@@ -10,7 +10,7 @@ import com.npclo.gdemo.R;
 import com.npclo.gdemo.utils.MeasureStateEnum;
 
 public class MyTextView extends AppCompatTextView {
-    private float value;
+    private String value;
     //FIXME 该条目的测量状态，未测，已测，正在修改等。。。
     private int state = MeasureStateEnum.UNMEASUED.ordinal();
 
@@ -21,7 +21,7 @@ public class MyTextView extends AppCompatTextView {
     public MyTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.MyTextView);
-        value = array.getFloat(R.styleable.MyTextView_value, 0);
+        value = array.getString(R.styleable.MyTextView_value);
         array.recycle();
     }
 
@@ -29,11 +29,11 @@ public class MyTextView extends AppCompatTextView {
         super(context, attrs, defStyleAttr);
     }
 
-    public float getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(float value) {
+    public void setValue(String value) {
         this.value = value;
     }
 

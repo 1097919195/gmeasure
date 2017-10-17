@@ -25,10 +25,6 @@ import rx.subscriptions.CompositeSubscription;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
-/**
- * Created by Endless on 2017/9/1.
- */
-
 public class HomePresenter implements HomeContract.Presenter {
     @NonNull
     private HomeFragment fragment;

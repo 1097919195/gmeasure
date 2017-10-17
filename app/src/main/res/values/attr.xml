@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MyTextView">
-        <attr name="value" format="float" />
+        <attr name="value" format="string" />
     </declare-styleable>
     <declare-styleable name="ViewfinderView">
         <attr name="corner_color" format="color" />
