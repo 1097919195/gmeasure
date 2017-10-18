@@ -140,7 +140,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         }
     }
 
-
     private void clearAndMeasureNext() {
         int count = gridView.getChildCount();
         for (int i = 0; i < count; i++) {

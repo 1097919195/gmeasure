@@ -121,7 +121,8 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
                     partNameList.add(p.getName());
                 }
                 String name = partNameList.get(0);
-                activity.speechSynthesizer.playText("请测" + name);
+                if (activity.speechSynthesizer != null)
+                    activity.speechSynthesizer.playText("请测" + name);
             }
         }
     }

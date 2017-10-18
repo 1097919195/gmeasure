@@ -36,10 +36,15 @@ public class MainActivity extends BaseActivity {
         init();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initSpeech();
+    }
+
     private void init() {
         rxPermissions = new RxPermissions(this);
         rxBleClient = RxBleClient.create(this);
-        initSpeech();
         //加载登录后的欢迎界面
         HomeFragment homeFragment = findFragment(HomeFragment.class);
         if (homeFragment == null) {
