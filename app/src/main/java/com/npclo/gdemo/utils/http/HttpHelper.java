@@ -25,7 +25,7 @@ import rx.functions.Func1;
  */
 
 public class HttpHelper {
-    private static final String BASE_URL = "http://www.npclo.com/api/";
+    private static final String BASE_URL = "https://www.npclo.com/api/";
     private static final int DEFAULT_TIMEOUT = 600;
     protected Retrofit retrofit;
 

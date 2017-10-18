@@ -77,13 +77,13 @@ public abstract class BaseFragment extends SupportFragment {
             showToast(e.getMessage());
         } else if (e instanceof BleException) {
             showToast("蓝牙设备异常，请重试", Toast.LENGTH_LONG);
-            toast2Speech("蓝牙设备异常，请重试");
+            speech("蓝牙设备异常，请重试");
         } else {
             showToast(getString(R.string.something_error));
         }
     }
 
-    protected void toast2Speech(String s) {
+    protected void speech(String s) {
     }
 
     protected int getVersionCode() {

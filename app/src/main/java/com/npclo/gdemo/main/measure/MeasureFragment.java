@@ -5,6 +5,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.npclo.gdemo.R;
@@ -45,6 +46,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     private MeasureContract.Presenter measurePresenter;
     private List<MyLineLayout> unMeasuredList = new ArrayList<>();
     private boolean initUmMeasureListFlag;
+    private List<String> measure_items;
 
     public static MeasureFragment newInstance() {
         return new MeasureFragment();
@@ -70,11 +72,14 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     protected void initView(View mRootView) {
         //渲染测量部位列表
         unbinder = ButterKnife.bind(this, mRootView);
+        baseToolbar.inflateMenu(R.menu.base_toolbar_menu);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        MenuItem item = baseToolbar.getMenu().getItem(0);
+        measure_items = Arrays.asList(getResources().getStringArray(R.array.items_sequence));
         try {
             MainActivity activity = ((MainActivity) getActivity());
             RxBleDevice bleDevice = activity.getRxBleDevice();
@@ -84,14 +89,20 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                 UUID characteristicUUID = activity.getCharacteristicUUID();
                 Observable<RxBleConnection> connectionObservable = activity.getConnectionObservable();
                 measurePresenter.startMeasure(characteristicUUID, connectionObservable);
+                item.setIcon(R.drawable.ble_connected);
+                speech("请测" + measure_items.get(0));
+            } else {
+                deName.setText(getString(R.string.device_disconnected));
+                item.setIcon(R.drawable.ble_disconnected);
+                speech("蓝牙未连接");
             }
         } catch (Exception e) {
             showToast("蓝牙连接异常，请重新连接！");
-            e.printStackTrace();
+            item.setIcon(R.drawable.ble_disconnected);
+            deName.setText("蓝牙状态异常");
         }
         initUmMeasureListFlag = true;
-        List<String> strings = Arrays.asList(getResources().getStringArray(R.array.items_sequence));
-        ItemAdapter2 adapter = new ItemAdapter2(getActivity(), R.layout.item_qc2, strings);
+        ItemAdapter2 adapter = new ItemAdapter2(getActivity(), R.layout.item_qc2, measure_items);
         gridView.setAdapter(adapter);
     }
 
@@ -142,6 +153,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
             ((AppCompatTextView) linearLayout.getChildAt(2)).setText("");
         }
         initUmMeasureListFlag = true;
+        speech("请测" + measure_items.get(0));
     }
 
     private void assignValue(float length, float angle, MyLineLayout layout) {
@@ -188,7 +200,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     }
 
     @Override
-    protected void toast2Speech(String s) {
+    protected void speech(String s) {
         ((MainActivity) getActivity()).speechSynthesizer.playText(s);
     }
 
