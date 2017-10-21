@@ -173,7 +173,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
             float value = (float) length / 10;//显示测量结果
             layout.setState(MeasureStateEnum.MEASURED.ordinal());//更新状态
             textView.setTextColor(getResources().getColor(R.color.measured));//修改颜色
-            float diff = Math.abs(Float.valueOf(textView.getValue()) - length);
+            float diff = Math.abs(Float.valueOf(textView.getValue()) - length);// FIXME: 2017/10/21 偏差
             valueView.setText(diff + "mm");
             String s = null;//最终播放文字
             String result;//播报当前测量结果
