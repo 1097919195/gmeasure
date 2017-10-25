@@ -21,7 +21,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.functions.Func1;
 
 /**
- * Created by Endless on 2017/7/19.
+ *
+ * @author Endless
+ * @date 2017/7/19
  */
 
 public class HttpHelper {

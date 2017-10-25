@@ -15,7 +15,12 @@ import rx.subscriptions.CompositeSubscription;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
+/**
+ * @author Endless
+ */
 public class QualityPresenter implements QualityContract.Presenter {
+    public static final int STANDARD_LENGTH = 16;
+    public static final int ADJUST_VALUE = 14;
     @NonNull
     private CompositeSubscription mSubscription;
     @NonNull
@@ -54,7 +59,8 @@ public class QualityPresenter implements QualityContract.Presenter {
         Subscription subscribe = new DemoHelper().getQualityItemWithId(id)
                 .subscribeOn(mSchedulerProvider.io())
                 .observeOn(mSchedulerProvider.ui())
-                .subscribe(item -> fragment.handleQualityItemResult(item), e -> fragment.handleError(e));
+                .subscribe(item -> fragment.handleQualityItemResult(item),
+                        e -> fragment.handleError(e));
         mSubscription.add(subscribe);
     }
 
@@ -62,13 +68,14 @@ public class QualityPresenter implements QualityContract.Presenter {
     public void getQualityItemInfoWithCode(String code) {
         Subscription subscribe = new DemoHelper().getQualityItemWithCode(code)
                 .subscribeOn(mSchedulerProvider.io())
-                .subscribe(item -> fragment.handleQualityItemResult(item), e -> fragment.handleError(e));
+                .subscribe(item -> fragment.handleQualityItemResult(item),
+                        e -> fragment.handleError(e));
         mSubscription.add(subscribe);
     }
 
     private void handleBleResult(byte[] v) {
         String s = HexString.bytesToHex(v);
-        if (s.length() == 16) { //判断接收到的数据是否准确
+        if (s.length() == STANDARD_LENGTH) {
             int code = Integer.parseInt("8D6A", 16);
             int length = Integer.parseInt(s.substring(0, 4), 16);
             int angle = Integer.parseInt(s.substring(4, 8), 16);
@@ -76,8 +83,7 @@ public class QualityPresenter implements QualityContract.Presenter {
             int a1 = length ^ code;
             int a2 = angle ^ code;
             int a3 = battery ^ code;
-//            Log.e(TAG, "获得数据：长度: " + a1 + "; 角度:  " + a2 + "; 电量: " + a3);
-            a1 += 14; //校正数据
+            a1 += ADJUST_VALUE;
             fragment.handleMeasureData(a1, (float) a2 / 10, a3);
         }
     }

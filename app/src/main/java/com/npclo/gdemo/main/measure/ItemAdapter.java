@@ -15,6 +15,9 @@ import com.npclo.gdemo.utils.views.MyTextView;
 
 import java.util.ArrayList;
 
+/**
+ * @author Endless
+ */
 public class ItemAdapter extends ArrayAdapter<Part> {
     private Context mContext;
     private int layoutResourceId;
@@ -39,7 +42,7 @@ public class ItemAdapter extends ArrayAdapter<Part> {
 
         if (convertView == null) {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
-            convertView = inflater.inflate(layoutResourceId, parent, false);
+            convertView = inflater.inflate(layoutResourceId, null, false);
             holder = new ViewHolder();
             holder.name = (MyTextView) convertView.findViewById(R.id.tv);
             convertView.setTag(holder);

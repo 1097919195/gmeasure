@@ -35,9 +35,13 @@ import rx.Observable;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
+/**
+ * @author Endless
+ */
 public class QualityFragment extends BaseFragment implements QualityContract.View {
     private static final int SCAN_HINT = 1001;
     private static final int CODE_HINT = 1002;
+    public static final int DEVIATION_RANGE = 0;
     @BindView(R.id.de_name)
     AppCompatTextView deName;
     @BindView(R.id.de_battery)
@@ -121,8 +125,9 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
                     partNameList.add(p.getName());
                 }
                 String name = partNameList.get(0);
-                if (activity.speechSynthesizer != null)
+                if (activity.speechSynthesizer != null) {
                     activity.speechSynthesizer.playText("请测" + name);
+                }
             }
         }
     }
@@ -147,10 +152,17 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
         super.handleError(e);
     }
 
+    /**
+     * @param length  单位：mm
+     * @param angle
+     * @param battery
+     */
     @Override
     public void handleMeasureData(int length, float angle, int battery) {
         deBattery.setText(battery + "%");
-        if (initUmMeasureListFlag) initUnMeasureList();
+        if (initUmMeasureListFlag) {
+            initUnMeasureList();
+        }
         if (unMeasuredList.size() != 0) {
             MyLineLayout lineLayout = (MyLineLayout) unMeasuredList.get(0);
             assignValue(length, angle, lineLayout);
@@ -165,21 +177,32 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
         afterResume(qualityItem);
     }
 
+    /**
+     * 赋值
+     *
+     * @param length 单位： mm
+     * @param angle
+     * @param layout
+     */
     private void assignValue(int length, float angle, MyLineLayout layout) {
         MyTextView valueView = ((MyTextView) layout.getChildAt(1)); //赋值
         MyTextView textView = ((MyTextView) layout.getChildAt(0)); //项目
         String cn = (String) textView.getText();
         try {
-            float value = (float) length / 10;//显示测量结果
+            float value = (float) length / 10;//显示测量结果: xx cm
             layout.setState(MeasureStateEnum.MEASURED.ordinal());//更新状态
             textView.setTextColor(getResources().getColor(R.color.measured));//修改颜色
-            float diff = Math.abs(Float.valueOf(textView.getValue()) - length);// FIXME: 2017/10/21 偏差
+            float diff = Math.abs(Float.valueOf(textView.getValue()) * 10 - length);
             valueView.setText(diff + "mm");
             String s = null;//最终播放文字
             String result;//播报当前测量结果
             String[] strings = getNextString();
             result = cn + value + "cm";
-            if (diff != 0) result += "偏差" + diff + "mm";
+            if (diff > DEVIATION_RANGE) {
+                result += "偏差" + diff + "mm";
+            } else {
+                result += "符合要求";
+            }
             unMeasuredList.remove(0);//att 最前的一项测量完毕
             if (!TextUtils.isEmpty(strings[0])) {
                 s = result + "        请测" + strings[0];
@@ -199,8 +222,9 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
         try {
             for (int i = 0; i < count; i++) {
                 MyLineLayout layout = (MyLineLayout) gridView.getChildAt(i);
-                if (layout.getState() == MeasureStateEnum.UNMEASUED.ordinal())
+                if (layout.getState() == MeasureStateEnum.UNMEASUED.ordinal()) {
                     unMeasuredList.add(layout);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -256,6 +280,8 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
                 } else {
                     showToast(getString(R.string.enter_qrcode_error));
                 }
+                break;
+            default:
                 break;
         }
     }
