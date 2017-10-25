@@ -192,14 +192,17 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
             float value = (float) length / 10;//显示测量结果: xx cm
             layout.setState(MeasureStateEnum.MEASURED.ordinal());//更新状态
             textView.setTextColor(getResources().getColor(R.color.measured));//修改颜色
-            float diff = Math.abs(Float.valueOf(textView.getValue()) * 10 - length);
+            int diff = length - (int) (Float.valueOf(textView.getValue()) * 10);
             valueView.setText(diff + "mm");
             String s = null;//最终播放文字
             String result;//播报当前测量结果
             String[] strings = getNextString();
             result = cn + value + "cm";
+            diff = Integer.parseInt(diff + "");
             if (diff > DEVIATION_RANGE) {
-                result += "偏差" + diff + "mm";
+                result += "偏大" + diff + "mm";
+            } else if (diff < DEVIATION_RANGE) {
+                result += "偏小" + diff + "mm";
             } else {
                 result += "符合要求";
             }
