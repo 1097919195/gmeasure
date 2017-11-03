@@ -8,6 +8,7 @@ import com.npclo.gdemo.utils.schedulers.BaseSchedulerProvider;
 import com.polidea.rxandroidble.RxBleConnection;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
@@ -21,6 +22,7 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 public class QualityPresenter implements QualityContract.Presenter {
     public static final int STANDARD_LENGTH = 16;
     public static final int ADJUST_VALUE = 14;
+    private static final int MEASURE_DURATION = 500;
     @NonNull
     private CompositeSubscription mSubscription;
     @NonNull
@@ -50,6 +52,7 @@ public class QualityPresenter implements QualityContract.Presenter {
                 .flatMap(rxBleConnection -> rxBleConnection.setupNotification(characteristicUUID))
                 .flatMap(notificationObservable -> notificationObservable)
                 .observeOn(mSchedulerProvider.ui())
+                .throttleFirst(MEASURE_DURATION, TimeUnit.MILLISECONDS)
                 .subscribe(this::handleBleResult, this::handleError);
         mSubscription.add(subscribe);
     }
