@@ -29,6 +29,7 @@ import rx.functions.Func1;
 public class HttpHelper {
     private static final String BASE_URL = "https://www.npclo.com/api/";
     private static final int DEFAULT_TIMEOUT = 600;
+    public static final int EXCEPTION_STATUS_LABEL = 1000;
     protected Retrofit retrofit;
 
     //构造方法私有
@@ -69,9 +70,12 @@ public class HttpHelper {
     public class HttpResponseFunc<T> implements Func1<HttpResponse<T>, T> {
         @Override
         public T call(HttpResponse<T> httpResponse) {
-            if (httpResponse.getStatus() >= 1000)
+            if (httpResponse.getStatus() >= EXCEPTION_STATUS_LABEL) {
                 throw new ApiException(httpResponse.getMsg());
-            if (httpResponse.getData() == null) throw new ApiException("暂无数据");
+            }
+            if (httpResponse.getData() == null) {
+                throw new ApiException("暂无数据");
+            }
             return httpResponse.getData();
         }
     }
