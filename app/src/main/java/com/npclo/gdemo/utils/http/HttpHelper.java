@@ -27,17 +27,16 @@ import rx.functions.Func1;
  */
 
 public class HttpHelper {
-    private static final String BASE_URL = "https://www.npclo.com/api/";
+    private static final String BASE_URL = "http://boya_api.npclo.com/api/";
     private static final int DEFAULT_TIMEOUT = 600;
-    public static final int EXCEPTION_STATUS_LABEL = 1000;
-    protected Retrofit retrofit;
+    private static final int EXCEPTION_STATUS_LABEL = 1000;
+    Retrofit retrofit;
 
     //构造方法私有
     protected HttpHelper() {
         //手动创建一个OkHttpClient并设置超时时间
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
-//        initHeader(httpClientBuilder);
         retrofit = new Retrofit.Builder()
                 .client(httpClientBuilder.build())
                 .addConverterFactory(GsonConverterFactory.create())

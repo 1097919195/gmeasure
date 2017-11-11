@@ -35,8 +35,6 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
-    }
-    packagingOptions {
         exclude 'META-INF/LICENSE'
     }
     configurations.all {

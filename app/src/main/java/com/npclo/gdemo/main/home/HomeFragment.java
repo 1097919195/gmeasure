@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,8 +18,6 @@ import com.npclo.gdemo.camera.CaptureActivity;
 import com.npclo.gdemo.data.BleDevice;
 import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.main.MainActivity;
-import com.npclo.gdemo.main.measure.MeasureFragment;
-import com.npclo.gdemo.main.measure.MeasurePresenter;
 import com.npclo.gdemo.main.quality.QualityFragment;
 import com.npclo.gdemo.main.quality.QualityPresenter;
 import com.npclo.gdemo.utils.schedulers.SchedulerProvider;
@@ -39,17 +38,15 @@ import rx.Observable;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
+/**
+ * @author Endless
+ */
 public class HomeFragment extends BaseFragment implements HomeContract.View {
     @BindView(R.id.base_toolbar)
     Toolbar toolbarBase;
-    @BindView(R.id.btn_ble)
-    AppCompatButton btnBle;
-    @BindView(R.id.btn_measure)
-    AppCompatButton btnMeasure;
     @BindView(R.id.btn_quality)
     AppCompatButton btnQuality;
     Unbinder unbinder;
-    private static final String TAG = HomeFragment.class.getSimpleName();
     private HomeContract.Presenter mPresenter;
     private MaterialDialog dialog;
     private static final int SCAN_HINT = 1001;
@@ -61,6 +58,8 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     private MaterialDialog connectingProgressBar;
     private MaterialDialog scanningProgressBar;
     private MaterialDialog resultDialog;
+    private MenuItem itemBle;
+    private RxBleDevice rxBleDevice;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -74,17 +73,15 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     @Override
     protected void initView(View mRootView) {
         unbinder = ButterKnife.bind(this, mRootView);
+        rxBleDevice = ((MainActivity) getActivity()).getRxBleDevice();
         initToolbar();
         configureResultList();
         initBleState();
     }
 
     private void initBleState() {
-        RxBleDevice rxBleDevice = ((MainActivity) getActivity()).getRxBleDevice();
         if (rxBleDevice != null && rxBleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
-            toolbarBase.getMenu().getItem(0).setIcon(R.drawable.ble_connected);
-            btnBle.setText(getString(R.string.connected));
-            btnBle.setEnabled(false);
+            itemBle.setIcon(R.drawable.ble_connected);
         }
     }
 
@@ -103,9 +100,18 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
      * 初始化toolbar的一些默认属性
      */
     protected void initToolbar() {
-        toolbarBase.setTitleTextColor(getResources().getColor(R.color.toolbar_text));//设置主标题颜色
+        toolbarBase.setTitleTextColor(getResources().getColor(R.color.toolbar_text));
         toolbarBase.inflateMenu(R.menu.base_toolbar_menu);
-        toolbarBase.getMenu().getItem(0).setIcon(R.drawable.ble_disconnected);
+        itemBle = toolbarBase.getMenu().getItem(0);
+        itemBle.setIcon(R.drawable.ble_disconnected);
+        itemBle.setOnMenuItemClickListener(view -> {
+            if (rxBleDevice != null && rxBleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
+                showToast(getString(R.string.connected));
+            } else {
+                tryConnectBle();
+            }
+            return true;
+        });
     }
 
     @Override
@@ -143,6 +149,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         );
     }
 
+    @Override
     public void handleBleScanException(BleScanException bleScanException) {
 
         switch (bleScanException.getReason()) {
@@ -182,6 +189,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         }
     }
 
+    @Override
     public void handleScanResult(ScanResult result) {
         if (scanningProgressBar != null) {
             scanningProgressBar.dismiss();
@@ -222,9 +230,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         showToast(getString(R.string.device_connected));
         ((MainActivity) getActivity()).speechSynthesizer.playText("蓝牙连接成功");
         ((MainActivity) getActivity()).setRxBleDevice(bleDevice);
-        toolbarBase.getMenu().getItem(0).setIcon(R.drawable.ble_connected);
-        btnBle.setText(getString(R.string.connected));
-        btnBle.setEnabled(false);
+        itemBle.setIcon(R.drawable.ble_connected);
     }
 
     @Override
@@ -268,43 +274,35 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         }
     }
 
-    @OnClick({R.id.btn_ble, R.id.btn_quality, R.id.btn_measure})
+    @OnClick(R.id.btn_quality)
     public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.btn_ble:
-                BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (!defaultAdapter.isEnabled()) {
-                    new MaterialDialog.Builder(getActivity())
-                            .content(getString(R.string.can_open_ble))
-                            .positiveText(getString(R.string.open))
-                            .negativeText(getString(R.string.cancel))
-                            .backgroundColor(getResources().getColor(R.color.white))
-                            .contentColor(getResources().getColor(R.color.primary))
-                            .onPositive((dialog, which) -> defaultAdapter.enable())
-                            .show();
-                }
-                ((MainActivity) getActivity()).getRxPermissions()
-                        .request(Manifest.permission.ACCESS_COARSE_LOCATION)
-                        .subscribe(grant -> {
-                            if (grant) {
-                                mPresenter.startScan();
-                            } else {
-                                showToast(getString(R.string.unauthorized_location));
-                            }
-                        });
-                break;
-            case R.id.btn_measure:
-                MeasureFragment fragment = MeasureFragment.newInstance();
-                fragment.setPresenter(new MeasurePresenter(fragment, SchedulerProvider.getInstance()));
-                start(fragment);
-                break;
-            case R.id.btn_quality:
-                Intent intent = new Intent(getActivity(), CaptureActivity.class);
-                startActivityForResult(intent, 1001);
-                break;
-            default:
-                break;
+
+        Intent intent = new Intent(getActivity(), CaptureActivity.class);
+        startActivityForResult(intent, 1001);
+
+    }
+
+    private void tryConnectBle() {
+        BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!defaultAdapter.isEnabled()) {
+            new MaterialDialog.Builder(getActivity())
+                    .content(getString(R.string.can_open_ble))
+                    .positiveText(getString(R.string.open))
+                    .negativeText(getString(R.string.cancel))
+                    .backgroundColor(getResources().getColor(R.color.white))
+                    .contentColor(getResources().getColor(R.color.primary))
+                    .onPositive((dialog, which) -> defaultAdapter.enable())
+                    .show();
         }
+        ((MainActivity) getActivity()).getRxPermissions()
+                .request(Manifest.permission.ACCESS_COARSE_LOCATION)
+                .subscribe(grant -> {
+                    if (grant) {
+                        mPresenter.startScan();
+                    } else {
+                        showToast(getString(R.string.unauthorized_location));
+                    }
+                });
     }
 
     @Override
