@@ -123,13 +123,12 @@ public class QualityPresenter implements QualityContract.Presenter {
      * 开启测量，需要检查device的状态
      */
     private void startMeasure() {
-        triggerDisconnect();
         Observable<RxBleConnection> connectionObservable = prepareConnectionObservable();
         if (connectionObservable != null) {
             Subscription subscribe = connectionObservable
                     .flatMap(rxBleConnection -> rxBleConnection.setupNotification(uuid))
                     .flatMap(notificationObservable -> notificationObservable)
-                    .subscribeOn(mSchedulerProvider.io())
+                    .subscribeOn(mSchedulerProvider.computation())
                     .observeOn(mSchedulerProvider.ui())
                     .throttleFirst(MEASURE_DURATION, TimeUnit.MILLISECONDS)
                     .subscribe(this::handleBleResult, this::handleError);

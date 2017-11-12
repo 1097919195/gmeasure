@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -22,6 +24,7 @@ import com.npclo.gdemo.utils.views.MyLineLayout;
 import com.npclo.gdemo.utils.views.MyTextView;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
+import com.polidea.rxandroidble.exceptions.BleGattException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,8 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     private static final int SCAN_HINT = 1001;
     private static final int CODE_HINT = 1002;
     public static final int DEVIATION_RANGE = 0;
+    @BindView(R.id.base_toolbar)
+    Toolbar toolbarBase;
     @BindView(R.id.de_name)
     AppCompatTextView deName;
     @BindView(R.id.de_battery)
@@ -59,6 +64,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     private List<LinearLayout> unMeasuredList = new ArrayList<>();
     private List<Part> resultPartsList = new ArrayList<>();
     private String itemId;
+    private MenuItem itemMenu;
 
     @Override
     public void setPresenter(@NonNull QualityContract.Presenter presenter) {
@@ -80,6 +86,10 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     @Override
     protected void initView(View mRootView) {
         unbinder = ButterKnife.bind(this, mRootView);
+        toolbarBase.setTitleTextColor(getResources().getColor(R.color.toolbar_text));
+        toolbarBase.inflateMenu(R.menu.base_toolbar_menu);
+        itemMenu = toolbarBase.getMenu().getItem(0);
+        itemMenu.setIcon(R.drawable.ble_disconnected);
     }
 
     @Override
@@ -87,13 +97,14 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
         super.onResume();
         initUmMeasureListFlag = true;
 
-        MainActivity activity = ((MainActivity) getActivity());
+        MainActivity activity = (MainActivity) getActivity();
         String macAddress = BaseApplication.getMacAddress(activity);
         if (!TextUtils.isEmpty(macAddress)) {
             RxBleDevice device = BaseApplication.getRxBleClient(activity).getBleDevice(macAddress);
             if (device != null && device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
                 //启动测量
                 deName.setText(device.getName());
+                itemMenu.setIcon(R.drawable.ble_connected);
                 mPresenter.subscribe();
             } else {
                 deName.setText(getString(R.string.device_disconnected));
@@ -153,7 +164,12 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
 
     @Override
     public void handleError(Throwable e) {
-        super.handleError(e);
+        if (e instanceof BleGattException) {
+            showToast("蓝牙连接断开，重连中...");
+            mPresenter.reConnect();
+        } else {
+            super.handleError(e);
+        }
     }
 
     /**

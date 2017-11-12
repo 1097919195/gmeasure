@@ -11,32 +11,20 @@ import java.util.UUID;
 
 public interface HomeContract {
     interface Presenter extends BasePresenter {
-        void connectDevice(String s);
+        void chooseDeviceWithAddress(String s);
 
         void startScan();
 
         void getQualityItemInfoWithId(String result);
 
         void getQualityItemInfoWithCode(String result);
-
-        void reconnect(String macAddress);
     }
 
     interface View extends BaseView<Presenter> {
 
-        void showLoading(boolean b);
-
         void handleBleScanException(BleScanException e);
 
-        void showError(String s);
-
-        void showError();
-
-        void showConnected(RxBleDevice bleDevice);
-
-        void isConnecting();
-
-        void setLoadingIndicator(boolean bool);
+        void showChoose(RxBleDevice bleDevice);
 
         void showScanning();
 

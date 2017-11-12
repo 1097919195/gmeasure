@@ -22,10 +22,12 @@ import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.main.MainActivity;
 import com.npclo.gdemo.main.quality.QualityFragment;
 import com.npclo.gdemo.main.quality.QualityPresenter;
+import com.npclo.gdemo.utils.Gog;
 import com.npclo.gdemo.utils.schedulers.SchedulerProvider;
 import com.polidea.rxandroidble.RxBleClient;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
+import com.polidea.rxandroidble.exceptions.BleAlreadyConnectedException;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.scan.ScanResult;
 
@@ -50,14 +52,12 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     AppCompatButton btnQuality;
     Unbinder unbinder;
     private HomeContract.Presenter mPresenter;
-    private MaterialDialog dialog;
     private static final int SCAN_HINT = 1001;
     private static final int CODE_HINT = 1002;
     private ScanResultsAdapter scanResultsAdapter;
     private List<BleDevice> bleDeviceList = new ArrayList<>();
     private List<String> rxBleDeviceAddressList = new ArrayList<>();
     private MaterialDialog.Builder scanResultDialog;
-    private MaterialDialog connectingProgressBar;
     private MaterialDialog scanningProgressBar;
     private MaterialDialog resultDialog;
     private MenuItem itemBle;
@@ -78,7 +78,6 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         rxBleClient = BaseApplication.getRxBleClient(getActivity());
         initToolbar();
         configureResultList();
-        initBleState();
     }
 
     private void initBleState() {
@@ -116,17 +115,11 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     @Override
     public void onResume() {
         super.onResume();
+        initBleState();
         itemBle.setOnMenuItemClickListener(view -> {
             String macAddress = BaseApplication.getMacAddress(getActivity());
-            if (!TextUtils.isEmpty(macAddress)) {
-                RxBleDevice bleDevice = rxBleClient.getBleDevice(macAddress);
-                if (bleDevice != null && bleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
-                    showToast(getString(R.string.connected));
-                } else {
-                    mPresenter.reconnect(macAddress);
-                }
-            } else {
-                tryConnectBle();
+            if (TextUtils.isEmpty(macAddress)) {
+                scanAndConnectBle();
             }
             return true;
         });
@@ -136,18 +129,6 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
-    }
-
-    @Override
-    public void showLoading(boolean b) {
-        if (b) {
-            dialog = new MaterialDialog.Builder(getActivity())
-                    .progress(true, 100)
-                    .backgroundColor(getResources().getColor(R.color.white))
-                    .show();
-        } else {
-            dialog.dismiss();
-        }
     }
 
     private void configureResultList() {
@@ -162,7 +143,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         //选择目的蓝牙设备
         scanResultsAdapter.setOnAdapterItemClickListener(v -> {
                     String s = ((TextView) v.findViewById(R.id.txt_mac)).getText().toString();
-                    mPresenter.connectDevice(s);
+            mPresenter.chooseDeviceWithAddress(s);
                 }
         );
     }
@@ -227,25 +208,21 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         }
     }
 
-    @Override
-    public void showError(String s) {
-        showToast(s);
-    }
 
     @Override
     public void handleError(Throwable e) {
-        super.handleError(e);
+        Gog.e(e.getMessage());
+        if (e instanceof BleScanException) {
+            handleBleScanException((BleScanException) e);
+        } else if (e instanceof BleAlreadyConnectedException) {
+            showToast("重复连接，请检查");
+        } else {
+            super.handleError(e);
+        }
     }
 
     @Override
-    public void showError() {
-        showToast(getString(R.string.unKnownError));
-    }
-
-    @Override
-    public void showConnected(RxBleDevice bleDevice) {
-        connectingProgressBar.dismiss();
-        BaseApplication.setBleAddress(getActivity(), bleDevice.getMacAddress());
+    public void showChoose(RxBleDevice bleDevice) {
         showToast(getString(R.string.device_connected));
         ((MainActivity) getActivity()).speechSynthesizer.playText("蓝牙连接成功");
         itemBle.setIcon(R.drawable.ble_connected);
@@ -255,21 +232,6 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     @Override
     public void setCharacteristicUUID(UUID characteristicUUID) {
         BaseApplication.setNotificationUUID(getActivity(), characteristicUUID);
-    }
-
-    @Override
-    public void isConnecting() {
-        connectingProgressBar = new MaterialDialog.Builder(getActivity())
-                .title(getString(R.string.connecting))
-                .titleColor(getResources().getColor(R.color.ff5001))
-                .backgroundColor(getResources().getColor(R.color.white))
-                .progress(true, 100)
-                .show();
-    }
-
-    @Override
-    public void setLoadingIndicator(boolean bool) {
-
     }
 
     @Override
@@ -298,7 +260,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         startActivityForResult(intent, 1001);
     }
 
-    private void tryConnectBle() {
+    private void scanAndConnectBle() {
         BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
         //判断蓝牙是否打开
         if (!defaultAdapter.isEnabled()) {

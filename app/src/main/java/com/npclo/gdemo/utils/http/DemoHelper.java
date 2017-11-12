@@ -1,6 +1,7 @@
 package com.npclo.gdemo.utils.http;
 
 
+import com.npclo.gdemo.data.HttpMsg;
 import com.npclo.gdemo.data.quality.QualityItem;
 
 import rx.Observable;
@@ -33,7 +34,7 @@ public class DemoHelper extends HttpHelper {
                 .map(new HttpResponseFunc<>());
     }
 
-    public Observable<QualityItem> uploadQualityResult(String result) {
+    public Observable<HttpMsg> uploadQualityResult(String result) {
         return retrofit.create(DemoService.class)
                 .uploadQualityResult(result)
                 .map(new HttpResponseFunc<>());

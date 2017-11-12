@@ -4,24 +4,16 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.NonNull;
 
-import com.npclo.gdemo.utils.Gog;
 import com.npclo.gdemo.utils.http.DemoHelper;
 import com.npclo.gdemo.utils.schedulers.BaseSchedulerProvider;
 import com.polidea.rxandroidble.RxBleClient;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
-import com.polidea.rxandroidble.exceptions.BleAlreadyConnectedException;
-import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.scan.ScanFilter;
 import com.polidea.rxandroidble.scan.ScanResult;
 import com.polidea.rxandroidble.scan.ScanSettings;
-import com.polidea.rxandroidble.utils.ConnectionSharingAdapter;
 
-import java.util.UUID;
-
-import rx.Observable;
 import rx.Subscription;
-import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
@@ -38,10 +30,6 @@ public class HomePresenter implements HomeContract.Presenter {
     private RxBleClient rxBleClient;
     @NonNull
     private CompositeSubscription mSubscription;
-    private RxBleDevice bleDevice;
-    private UUID characteristicUUID;
-    private PublishSubject<Void> disconnectTriggerSubject = PublishSubject.create();
-    private Observable<RxBleConnection> connectionObservable;
     private Subscription scanSubscribe;
 
     public HomePresenter(@NonNull RxBleClient client, @NonNull HomeContract.View view,
@@ -62,37 +50,14 @@ public class HomePresenter implements HomeContract.Presenter {
         mSubscription.clear();
     }
 
-    private Observable<RxBleConnection> prepareConnectionObservable() {
-        checkNotNull(bleDevice);
-        return bleDevice
-                .establishConnection(false)
-                .takeUntil(disconnectTriggerSubject)
-                .compose(new ConnectionSharingAdapter());
-    }
-
     private void handleError(Throwable e) {
-        Gog.e(e.getMessage());
-        if (e instanceof BleScanException) {
-            fragment.handleBleScanException((BleScanException) e);
-        } else if (e instanceof BleAlreadyConnectedException) {
-            fragment.showError("重复连接，请检查");
-        } else {
-            fragment.showError();
-        }
-    }
-
-    private void triggerDisconnect() {
-        disconnectTriggerSubject.onNext(null);
+        fragment.handleError(e);
     }
 
     private boolean isCharacteristicNotifiable(BluetoothGattCharacteristic characteristic) {
         return (characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0;
     }
 
-    private boolean isConnected() {
-        checkNotNull(bleDevice);
-        return bleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
-    }
 
     /**
      * 根据macAddress连接设备
@@ -100,7 +65,7 @@ public class HomePresenter implements HomeContract.Presenter {
      * @param s 设备地址
      */
     @Override
-    public void connectDevice(String s) {
+    public void chooseDeviceWithAddress(String s) {
         try {
             if (scanSubscribe != null || scanSubscribe.isUnsubscribed()) {
                 scanSubscribe.unsubscribe();
@@ -110,7 +75,7 @@ public class HomePresenter implements HomeContract.Presenter {
             e.printStackTrace();
         }
 
-        bleDevice = rxBleClient.getBleDevice(s);
+        RxBleDevice bleDevice = rxBleClient.getBleDevice(s);
         bleDevice.establishConnection(false)
                 .flatMap(RxBleConnection::discoverServices)
                 .first() // Disconnect automatically after discovery
@@ -119,33 +84,14 @@ public class HomePresenter implements HomeContract.Presenter {
                     for (BluetoothGattService service : deviceServices.getBluetoothGattServices()) {
                         for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
                             if (isCharacteristicNotifiable(characteristic)) {
-                                characteristicUUID = characteristic.getUuid();
-                                connectionObservable = prepareConnectionObservable();
-                                fragment.setCharacteristicUUID(characteristicUUID);
+                                fragment.setCharacteristicUUID(characteristic.getUuid());
                                 fragment.setBleAddress(s);
-                                toConnect();
+                                fragment.showChoose(bleDevice);
                                 break;
                             }
                         }
                     }
                 }, this::handleError);
-    }
-
-    private void toConnect() {
-        if (isConnected()) {
-            triggerDisconnect();
-        } else {
-            connectionObservable
-                    .flatMap(RxBleConnection::discoverServices)
-                    .flatMap(rxBleDeviceServices -> rxBleDeviceServices.getCharacteristic(characteristicUUID))
-                    .observeOn(mSchedulerProvider.ui())
-                    .doOnSubscribe(this::connecting)
-                    .subscribe(c -> fragment.showConnected(bleDevice), this::handleError);
-        }
-    }
-
-    private void connecting() {
-        fragment.isConnecting();
     }
 
     @Override
@@ -157,17 +103,12 @@ public class HomePresenter implements HomeContract.Presenter {
                 new ScanFilter.Builder().build())
                 .observeOn(mSchedulerProvider.ui())
                 .doOnSubscribe(this::scanning)
-                .doOnUnsubscribe(this::clearSubscription)
                 .subscribe(this::handleScanResult, this::handleError);
         mSubscription.add(scanSubscribe);
     }
 
     private void handleScanResult(ScanResult scanResult) {
         fragment.handleScanResult(scanResult);
-    }
-
-    private void clearSubscription() {
-        mSubscription.clear();
     }
 
     private void scanning() {
@@ -190,10 +131,5 @@ public class HomePresenter implements HomeContract.Presenter {
                 .subscribeOn(mSchedulerProvider.io())
                 .subscribe(item -> fragment.handleQualityItemResult(item), e -> fragment.handleError(e));
         mSubscription.add(subscribe);
-    }
-
-    @Override
-    public void reconnect(String macAddress) {
-
     }
 }

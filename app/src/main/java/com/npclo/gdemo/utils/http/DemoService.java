@@ -1,5 +1,6 @@
 package com.npclo.gdemo.utils.http;
 
+import com.npclo.gdemo.data.HttpMsg;
 import com.npclo.gdemo.data.HttpResponse;
 import com.npclo.gdemo.data.quality.QualityItem;
 
@@ -25,5 +26,5 @@ public interface DemoService {
 
     @Multipart
     @POST("qc/result")
-    Observable<HttpResponse<QualityItem>> uploadQualityResult(@Part("result") String result);
+    Observable<HttpResponse<HttpMsg>> uploadQualityResult(@Part("result") String result);
 }
