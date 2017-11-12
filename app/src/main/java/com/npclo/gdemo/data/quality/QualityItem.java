@@ -2,6 +2,7 @@ package com.npclo.gdemo.data.quality;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
@@ -11,10 +12,19 @@ import java.util.List;
  */
 
 public class QualityItem implements Parcelable {
+    @Nullable
     private String _id;
+    @Nullable
     private String code;
+    @Nullable
     private String category;
+    @Nullable
     private List<Part> parts;
+
+    public QualityItem(String id, List<Part> p) {
+        _id = id;
+        parts = p;
+    }
 
     protected QualityItem(Parcel in) {
         _id = in.readString();

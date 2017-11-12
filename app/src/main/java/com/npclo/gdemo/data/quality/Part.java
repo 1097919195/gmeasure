@@ -26,11 +26,6 @@ public class Part {
      */
     @Nullable
     private int code;
-    /**
-     * 质检次数
-     */
-    @Nullable
-    private int time;
 
     public String getName() {
         return name;
@@ -62,13 +57,5 @@ public class Part {
 
     public void setCode(int code) {
         this.code = code;
-    }
-
-    public int getTime() {
-        return time;
-    }
-
-    public void setTime(int time) {
-        this.time = time;
     }
 }

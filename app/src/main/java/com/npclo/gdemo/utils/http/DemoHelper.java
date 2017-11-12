@@ -23,12 +23,19 @@ public class DemoHelper extends HttpHelper {
 
     /**
      * 手动输入二维码编号获取信息
+     *
      * @param code 二维码编号
      * @return
      */
     public Observable<QualityItem> getQualityItemWithCode(String code) {
         return retrofit.create(DemoService.class)
                 .getQualityItemWithCode(code)
+                .map(new HttpResponseFunc<>());
+    }
+
+    public Observable<QualityItem> uploadQualityResult(String result) {
+        return retrofit.create(DemoService.class)
+                .uploadQualityResult(result)
                 .map(new HttpResponseFunc<>());
     }
 }

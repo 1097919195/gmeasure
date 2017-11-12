@@ -94,6 +94,11 @@ public class HomePresenter implements HomeContract.Presenter {
         return bleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
     }
 
+    /**
+     * 根据macAddress连接设备
+     *
+     * @param s 设备地址
+     */
     @Override
     public void connectDevice(String s) {
         try {
@@ -153,16 +158,16 @@ public class HomePresenter implements HomeContract.Presenter {
                 .observeOn(mSchedulerProvider.ui())
                 .doOnSubscribe(this::scanning)
                 .doOnUnsubscribe(this::clearSubscription)
-                .subscribe(this::handleResult, this::handleError);
+                .subscribe(this::handleScanResult, this::handleError);
         mSubscription.add(scanSubscribe);
     }
 
-    private void handleResult(ScanResult scanResult) {
+    private void handleScanResult(ScanResult scanResult) {
         fragment.handleScanResult(scanResult);
     }
 
     private void clearSubscription() {
-
+        mSubscription.clear();
     }
 
     private void scanning() {

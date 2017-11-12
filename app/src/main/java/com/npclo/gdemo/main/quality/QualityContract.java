@@ -3,11 +3,8 @@ package com.npclo.gdemo.main.quality;
 import com.npclo.gdemo.base.BasePresenter;
 import com.npclo.gdemo.base.BaseView;
 import com.npclo.gdemo.data.quality.QualityItem;
-import com.polidea.rxandroidble.RxBleConnection;
 
 import java.util.UUID;
-
-import rx.Observable;
 
 /**
  * Created by Endless on 2017/10/13.
@@ -22,6 +19,8 @@ public interface QualityContract {
         void setUUID(UUID characteristicUUID);
 
         void reConnect();
+
+        void uploadResult(QualityItem item);
     }
 
     interface View extends BaseView<Presenter> {

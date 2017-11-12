@@ -3,9 +3,12 @@ package com.npclo.gdemo.main.quality;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
 import com.npclo.gdemo.base.BaseApplication;
+import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.utils.Gog;
 import com.npclo.gdemo.utils.HexString;
+import com.npclo.gdemo.utils.aes.AesException;
 import com.npclo.gdemo.utils.aes.AesUtils;
 import com.npclo.gdemo.utils.http.DemoHelper;
 import com.npclo.gdemo.utils.schedulers.BaseSchedulerProvider;
@@ -50,7 +53,7 @@ public class QualityPresenter implements QualityContract.Presenter {
 
     @Override
     public void subscribe() {
-        reConnect();
+        startMeasure();
     }
 
     @Override
@@ -120,6 +123,7 @@ public class QualityPresenter implements QualityContract.Presenter {
      * 开启测量，需要检查device的状态
      */
     private void startMeasure() {
+        triggerDisconnect();
         Observable<RxBleConnection> connectionObservable = prepareConnectionObservable();
         if (connectionObservable != null) {
             Subscription subscribe = connectionObservable
@@ -157,5 +161,29 @@ public class QualityPresenter implements QualityContract.Presenter {
 
     private void handleError(Throwable e) {
         fragment.handleError(e);
+    }
+
+    @Override
+    public void uploadResult(QualityItem item) {
+        String s = (new Gson()).toJson(item);
+        if (aesUtils == null) {
+            aesUtils = new AesUtils();
+        }
+        String s1 = null;
+        String nonce = aesUtils.getRandomStr();
+        String timeStamp = Long.toString(System.currentTimeMillis());
+        try {
+            s1 = aesUtils.encryptMsg(s, timeStamp, nonce);
+        } catch (AesException e) {
+            e.printStackTrace();
+        }
+        Subscription subscribe = new DemoHelper()
+                .uploadQualityResult(s1)
+                .subscribeOn(mSchedulerProvider.io())
+//                .observeOn(schedulerProvider.ui())
+                .subscribe(v -> {
+                        }, e -> fragment.handleError(e)
+                );
+        mSubscription.add(subscribe);
     }
 }

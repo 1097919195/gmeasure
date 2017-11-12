@@ -57,6 +57,8 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     private QualityContract.Presenter mPresenter;
     private boolean initUmMeasureListFlag;
     private List<LinearLayout> unMeasuredList = new ArrayList<>();
+    private List<Part> resultPartsList = new ArrayList<>();
+    private String itemId;
 
     @Override
     public void setPresenter(@NonNull QualityContract.Presenter presenter) {
@@ -119,6 +121,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
             List<String> partNameList = new ArrayList<>();
             quType.setText(item.getCategory());
             quNum.setText(item.getCode());
+            itemId = item.get_id();
             partList = item.getParts();
             initMeasureView(partList);
             if (partList.size() > 0) {
@@ -191,6 +194,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
      * @param layout
      */
     private void assignValue(int length, float angle, MyLineLayout layout) {
+        Part part = new Part();
         MyTextView valueView = ((MyTextView) layout.getChildAt(1)); //赋值
         MyTextView textView = ((MyTextView) layout.getChildAt(0)); //项目
         String cn = (String) textView.getText();
@@ -207,12 +211,18 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
             diff = Integer.parseInt(diff + "");
             if (diff > DEVIATION_RANGE) {
                 result += "偏大" + diff + "mm";
+                part.setCode(1);
             } else if (diff < DEVIATION_RANGE) {
                 result += "偏小" + diff + "mm";
+                part.setCode(-1);
             } else {
                 result += "符合要求";
+                part.setCode(0);
             }
             unMeasuredList.remove(0);//att 最前的一项测量完毕
+            part.setName(cn);
+            part.setOriValue(Float.valueOf(textView.getValue()));
+            part.setActValue((float) (length / 10));
             if (!TextUtils.isEmpty(strings[0])) {
                 s = result + "        请测" + strings[0];
             }
@@ -220,6 +230,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
                 s = result + strings[1];
             }
             ((MainActivity) getActivity()).speechSynthesizer.playText(s);
+            resultPartsList.add(part);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -258,7 +269,8 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     @OnClick(R.id.btn_next)
     public void onViewClicked() {
         if (!initUmMeasureListFlag && unMeasuredList.size() == 0) {
-//            mPresenter.uploadResult();
+            QualityItem qualityItem = new QualityItem(itemId, resultPartsList);
+            mPresenter.uploadResult(qualityItem);
             Intent intent = new Intent(getActivity(), CaptureActivity.class);
             startActivityForResult(intent, 1001);
         } else {
