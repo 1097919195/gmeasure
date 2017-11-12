@@ -15,11 +15,13 @@ import rx.Observable;
 
 public interface QualityContract {
     interface Presenter extends BasePresenter {
-        void startMeasure(UUID characteristicUUID, Observable<RxBleConnection> connectionObservable);
-
         void getQualityItemInfoWithId(String result);
 
         void getQualityItemInfoWithCode(String result);
+
+        void setUUID(UUID characteristicUUID);
+
+        void reConnect();
     }
 
     interface View extends BaseView<Presenter> {
@@ -28,5 +30,7 @@ public interface QualityContract {
         void handleMeasureData(int a1, float a2, int a3);
 
         void handleQualityItemResult(QualityItem item);
+
+        void showDeviceError();
     }
 }

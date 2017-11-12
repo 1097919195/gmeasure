@@ -21,7 +21,7 @@ public class MyTextView extends AppCompatTextView {
     public MyTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.MyTextView);
-        value = array.getString(R.styleable.MyTextView_value);
+        value = array.getString(R.styleable.MyTextView_oriValue);
         array.recycle();
     }
 

@@ -126,7 +126,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/btn_radius_solid_primary"
-                android:text="下一件"
+                android:text="@string/next_quality"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="20sp" />

@@ -3,6 +3,8 @@ package com.npclo.gdemo.utils.http;
 
 import com.npclo.gdemo.data.HttpResponse;
 import com.npclo.gdemo.utils.ApiException;
+import com.npclo.gdemo.utils.aes.AesException;
+import com.npclo.gdemo.utils.aes.AesUtils;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +39,7 @@ public class HttpHelper {
         //手动创建一个OkHttpClient并设置超时时间
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+        initHeader(httpClientBuilder);
         retrofit = new Retrofit.Builder()
                 .client(httpClientBuilder.build())
                 .addConverterFactory(GsonConverterFactory.create())
@@ -59,8 +62,17 @@ public class HttpHelper {
 
         httpClientBuilder.addInterceptor(chain -> {
             Request original = chain.request();
+            String s = null;
+            AesUtils aesUtils = new AesUtils();
+            try {
+                String key2 = aesUtils.encryptMsg(base64Encoded, null, aesUtils.getRandomStr());
+                s = key2.replaceAll("\\n", "");
+            } catch (AesException e) {
+                e.printStackTrace();
+            }
             Request.Builder requestBuilder = original.newBuilder()
-                    .header("X-Authorization", jwt); // <-- this is the important line
+                    .header("X-Authorization", jwt)
+                    .header("X-Key", s);
             Request request = requestBuilder.build();
             return chain.proceed(request);
         });

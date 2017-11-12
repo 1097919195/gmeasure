@@ -10,12 +10,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.npclo.gdemo.R;
+import com.npclo.gdemo.base.BaseApplication;
 import com.npclo.gdemo.base.BaseFragment;
 import com.npclo.gdemo.camera.CaptureActivity;
 import com.npclo.gdemo.data.quality.Part;
 import com.npclo.gdemo.data.quality.QualityItem;
 import com.npclo.gdemo.main.MainActivity;
-import com.npclo.gdemo.main.measure.ItemAdapter;
 import com.npclo.gdemo.utils.MeasureStateEnum;
 import com.npclo.gdemo.utils.views.MyGridView;
 import com.npclo.gdemo.utils.views.MyLineLayout;
@@ -31,7 +31,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import rx.Observable;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
@@ -65,6 +64,13 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        UUID characteristicUUID = BaseApplication.getUUID(getActivity());
+        mPresenter.setUUID(characteristicUUID);
+    }
+
+    @Override
     protected int getLayoutId() {
         return R.layout.frag_quality;
     }
@@ -80,22 +86,17 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
         initUmMeasureListFlag = true;
 
         MainActivity activity = ((MainActivity) getActivity());
-        RxBleDevice device = activity.getRxBleDevice();
-        if (device != null) {
-            deName.setText(device.getName());
-        } else {
-            deName.setText(getString(R.string.device_disconnected));
-        }
-        try {
+        String macAddress = BaseApplication.getMacAddress(activity);
+        if (!TextUtils.isEmpty(macAddress)) {
+            RxBleDevice device = BaseApplication.getRxBleClient(activity).getBleDevice(macAddress);
             if (device != null && device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
                 //启动测量
-                UUID characteristicUUID = activity.getCharacteristicUUID();
-                Observable<RxBleConnection> connectionObservable = activity.getConnectionObservable();
-                mPresenter.startMeasure(characteristicUUID, connectionObservable);
+                deName.setText(device.getName());
+                mPresenter.subscribe();
+            } else {
+                deName.setText(getString(R.string.device_disconnected));
+                mPresenter.reConnect();
             }
-        } catch (Exception e) {
-            showToast("蓝牙连接异常，请重新连接！");
-            e.printStackTrace();
         }
 
         Bundle bundle = getArguments();
@@ -107,7 +108,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
-        Bundle bundle = getArguments();
+        Bundle bundle = getArguments(); // FIXME: 2017/11/12 这一块需要好好考虑。。。
         bundle.putParcelable("item", null);
     }
 
@@ -117,7 +118,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
             List<Part> partList;
             List<String> partNameList = new ArrayList<>();
             quType.setText(item.getCategory());
-            quNum.setText(item.get_id());
+            quNum.setText(item.getCode());
             partList = item.getParts();
             initMeasureView(partList);
             if (partList.size() > 0) {
@@ -175,6 +176,11 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     @Override
     public void handleQualityItemResult(QualityItem qualityItem) {
         afterResume(qualityItem);
+    }
+
+    @Override
+    public void showDeviceError() {
+        showToast("蓝牙状态异常，请重新连接");
     }
 
     /**
@@ -252,6 +258,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
     @OnClick(R.id.btn_next)
     public void onViewClicked() {
         if (!initUmMeasureListFlag && unMeasuredList.size() == 0) {
+//            mPresenter.uploadResult();
             Intent intent = new Intent(getActivity(), CaptureActivity.class);
             startActivityForResult(intent, 1001);
         } else {

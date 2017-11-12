@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.npclo.gdemo.R;
 import com.npclo.gdemo.utils.ApiException;
+import com.npclo.gdemo.utils.Gog;
 import com.polidea.rxandroidble.exceptions.BleException;
 
 import java.net.ConnectException;
@@ -64,9 +65,9 @@ public abstract class BaseFragment extends SupportFragment {
      * 统一处理错误 RxJava调用
      *
      * @param e
-     * @param TAG
      */
     protected void handleError(Throwable e) {
+        Gog.e(e.getMessage());
         if (e instanceof SocketTimeoutException) {
             showToast(getString(R.string.net_connect_timeout));
         } else if (e instanceof ConnectException) {

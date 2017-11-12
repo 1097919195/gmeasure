@@ -1,17 +1,24 @@
 package com.npclo.gdemo.main.quality;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.npclo.gdemo.base.BaseApplication;
+import com.npclo.gdemo.utils.Gog;
 import com.npclo.gdemo.utils.HexString;
+import com.npclo.gdemo.utils.aes.AesUtils;
 import com.npclo.gdemo.utils.http.DemoHelper;
 import com.npclo.gdemo.utils.schedulers.BaseSchedulerProvider;
 import com.polidea.rxandroidble.RxBleConnection;
+import com.polidea.rxandroidble.RxBleDevice;
+import com.polidea.rxandroidble.utils.ConnectionSharingAdapter;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
+import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
@@ -26,35 +33,29 @@ public class QualityPresenter implements QualityContract.Presenter {
     @NonNull
     private CompositeSubscription mSubscription;
     @NonNull
-    private QualityFragment fragment;
+    private QualityContract.View fragment;
     @NonNull
     private BaseSchedulerProvider mSchedulerProvider;
+    private AesUtils aesUtils;
+    private RxBleDevice device;
+    private PublishSubject<Void> disconnectTriggerSubject = PublishSubject.create();
+    private UUID uuid;
 
-    public QualityPresenter(@NonNull QualityFragment qualityFragment, @NonNull BaseSchedulerProvider mSchedulerProvider) {
+    public QualityPresenter(@NonNull QualityFragment qualityFragment, @NonNull BaseSchedulerProvider schedulerProvider) {
         mSubscription = new CompositeSubscription();
         fragment = checkNotNull(qualityFragment);
-        this.mSchedulerProvider = mSchedulerProvider;
+        this.mSchedulerProvider = schedulerProvider;
         fragment.setPresenter(this);
     }
 
     @Override
     public void subscribe() {
+        reConnect();
     }
 
     @Override
     public void unsubscribe() {
         mSubscription.clear();
-    }
-
-    @Override
-    public void startMeasure(UUID characteristicUUID, Observable<RxBleConnection> connectionObservable) {
-        Subscription subscribe = connectionObservable
-                .flatMap(rxBleConnection -> rxBleConnection.setupNotification(characteristicUUID))
-                .flatMap(notificationObservable -> notificationObservable)
-                .observeOn(mSchedulerProvider.ui())
-                .throttleFirst(MEASURE_DURATION, TimeUnit.MILLISECONDS)
-                .subscribe(this::handleBleResult, this::handleError);
-        mSubscription.add(subscribe);
     }
 
     @Override
@@ -76,8 +77,71 @@ public class QualityPresenter implements QualityContract.Presenter {
         mSubscription.add(subscribe);
     }
 
+    @Override
+    public void setUUID(UUID characteristicUUID) {
+        uuid = checkNotNull(characteristicUUID);
+    }
+
+    @Override
+    public void reConnect() {
+        Gog.d("isConnected " + isConnected());
+        if (isConnected()) {
+            triggerDisconnect();
+        } else {
+            startMeasure();
+        }
+    }
+
+    private boolean isConnected() {
+        Context context = ((QualityFragment) fragment).getActivity();
+        String macAddress = BaseApplication.getMacAddress(context);
+        if (macAddress != null) {
+            device = BaseApplication.getRxBleClient(context).getBleDevice(macAddress);
+            return device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
+        } else {
+            return false;
+        }
+    }
+
+    private Observable<RxBleConnection> prepareConnectionObservable() {
+        Context context = ((QualityFragment) fragment).getActivity();
+        String macAddress = BaseApplication.getMacAddress(context);
+        if (macAddress != null) {
+            device = BaseApplication.getRxBleClient(context).getBleDevice(macAddress);
+            return device.establishConnection(false)
+                    .takeUntil(disconnectTriggerSubject)
+                    .compose(new ConnectionSharingAdapter());
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 开启测量，需要检查device的状态
+     */
+    private void startMeasure() {
+        Observable<RxBleConnection> connectionObservable = prepareConnectionObservable();
+        if (connectionObservable != null) {
+            Subscription subscribe = connectionObservable
+                    .flatMap(rxBleConnection -> rxBleConnection.setupNotification(uuid))
+                    .flatMap(notificationObservable -> notificationObservable)
+                    .subscribeOn(mSchedulerProvider.io())
+                    .observeOn(mSchedulerProvider.ui())
+                    .throttleFirst(MEASURE_DURATION, TimeUnit.MILLISECONDS)
+                    .subscribe(this::handleBleResult, this::handleError);
+            mSubscription.add(subscribe);
+        } else {
+            fragment.showDeviceError();
+        }
+    }
+
+    private void triggerDisconnect() {
+        disconnectTriggerSubject.onNext(null);
+    }
+
     private void handleBleResult(byte[] v) {
         String s = HexString.bytesToHex(v);
+        Gog.d("获取到测量结果=======" + s);
         if (s.length() == STANDARD_LENGTH) {
             int code = Integer.parseInt("8D6A", 16);
             int length = Integer.parseInt(s.substring(0, 4), 16);
@@ -94,6 +158,4 @@ public class QualityPresenter implements QualityContract.Presenter {
     private void handleError(Throwable e) {
         fragment.handleError(e);
     }
-
-
 }

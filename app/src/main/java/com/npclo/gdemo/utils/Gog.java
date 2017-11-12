@@ -3,11 +3,17 @@ package com.npclo.gdemo.utils;
 import android.util.Log;
 
 /**
- * Created by Endless on 2017/10/17.
+ *
+ * @author Endless
+ * @date 2017/10/17
  */
 
 public class Gog {
-    public static void lod(String msg) {
+    public static void d(String msg) {
         Log.d("TAG", msg);
+    }
+
+    public static void e(String msg) {
+        Log.e("TAG", msg);
     }
 }

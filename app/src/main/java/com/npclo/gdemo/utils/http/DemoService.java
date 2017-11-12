@@ -8,13 +8,15 @@ import retrofit2.http.Path;
 import rx.Observable;
 
 /**
- * Created by Endless on 2017/8/1.
+ *
+ * @author Endless
+ * @date 2017/8/1
  */
 
 public interface DemoService {
-    @GET("qc/itemsingle/{id}")
+    @GET("qc/id/{id}")
     Observable<HttpResponse<QualityItem>> getQualityItemWithId(@Path("id") String id);
 
-    @GET("qc/itemsingle/{code}")
+    @GET("qc/code/{code}")
     Observable<HttpResponse<QualityItem>> getQualityItemWithCode(@Path("code") String code);
 }

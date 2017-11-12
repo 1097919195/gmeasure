@@ -1,4 +1,4 @@
-package com.npclo.gdemo.main.measure;
+package com.npclo.gdemo.main.quality;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,9 +16,11 @@ import com.npclo.gdemo.utils.views.MyTextView;
 import java.util.ArrayList;
 
 /**
- * @author Endless
+ * Created by Endless on 2017/11/12.
  */
-public class ItemAdapter extends ArrayAdapter<Part> {
+
+class ItemAdapter extends ArrayAdapter<Part> {
+    private static final String TAG = ItemAdapter.class.getSimpleName();
     private Context mContext;
     private int layoutResourceId;
     private ArrayList<Part> mGridData = new ArrayList<>();
@@ -44,16 +46,16 @@ public class ItemAdapter extends ArrayAdapter<Part> {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
             convertView = inflater.inflate(layoutResourceId, null, false);
             holder = new ViewHolder();
-            holder.name = (MyTextView) convertView.findViewById(R.id.tv);
+            holder.textView = (MyTextView) convertView.findViewById(R.id.tv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         Part item = mGridData.get(position);
 
-        MyTextView textView = holder.name;
+        MyTextView textView = holder.textView;
         textView.setText(item.getName());
-        textView.setValue(item.getValue() + "");
+        textView.setValue(item.getOriValue() + "");
         return convertView;
     }
 
@@ -73,6 +75,6 @@ public class ItemAdapter extends ArrayAdapter<Part> {
     }
 
     private class ViewHolder {
-        MyTextView name;
+        MyTextView textView;
     }
 }

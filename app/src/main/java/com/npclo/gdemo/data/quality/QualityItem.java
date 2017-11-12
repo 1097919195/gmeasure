@@ -6,17 +6,28 @@ import android.os.Parcelable;
 import java.util.List;
 
 /**
- * Created by Endless on 2017/10/14.
+ * @author Endless
+ * @date 2017/10/14
  */
 
 public class QualityItem implements Parcelable {
     private String _id;
+    private String code;
     private String category;
     private List<Part> parts;
 
     protected QualityItem(Parcel in) {
         _id = in.readString();
         category = in.readString();
+        code = in.readString();
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public static final Creator<QualityItem> CREATOR = new Creator<QualityItem>() {
@@ -64,5 +75,6 @@ public class QualityItem implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(_id);
         dest.writeString(category);
+        dest.writeString(code);
     }
 }

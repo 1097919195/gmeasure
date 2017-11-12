@@ -71,7 +71,7 @@
     <string name="device_connected">蓝牙已连接</string>
     <string name="prompt_connected">已连接</string>
     <string name="prompt_disconnected">未连接</string>
-    <string name="device_disconnected">蓝牙未连接</string>
+    <string name="device_disconnected">蓝牙未连接，重连中...</string>
     <string name="ble_info">蓝牙状态：</string>
     <string name="battery_unknown">N/A</string>
     <string name="connecting">连接中...</string>
@@ -201,4 +201,9 @@
     <string name="can_open_ble">是否打开蓝牙</string>
     <string name="open">打开</string>
     <string name="unauthorized_location">未授予位置信息权限</string>
+    <string name="code_input_type">编码获取方式</string>
+    <string name="code_input_hint">待质检服装的编号可选择手动输入或者扫描二维码获取</string>
+    <string name="manual_input_qrcode">手动输入</string>
+    <string name="input_qrcode">输入编号</string>
+    <string name="next_quality">下一件质检</string>
 </resources>

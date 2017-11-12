@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.NonNull;
 
+import com.npclo.gdemo.utils.Gog;
 import com.npclo.gdemo.utils.http.DemoHelper;
 import com.npclo.gdemo.utils.schedulers.BaseSchedulerProvider;
 import com.polidea.rxandroidble.RxBleClient;
@@ -25,9 +26,12 @@ import rx.subscriptions.CompositeSubscription;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
+/**
+ * @author Endless
+ */
 public class HomePresenter implements HomeContract.Presenter {
     @NonNull
-    private HomeFragment fragment;
+    private HomeContract.View fragment;
     @NonNull
     private BaseSchedulerProvider mSchedulerProvider;
     @NonNull
@@ -40,9 +44,10 @@ public class HomePresenter implements HomeContract.Presenter {
     private Observable<RxBleConnection> connectionObservable;
     private Subscription scanSubscribe;
 
-    public HomePresenter(@NonNull RxBleClient client, @NonNull HomeContract.View view, @NonNull BaseSchedulerProvider schedulerProvider) {
+    public HomePresenter(@NonNull RxBleClient client, @NonNull HomeContract.View view,
+                         @NonNull BaseSchedulerProvider schedulerProvider) {
         rxBleClient = checkNotNull(client);
-        fragment = ((HomeFragment) checkNotNull(view));
+        fragment = checkNotNull(view);
         mSchedulerProvider = checkNotNull(schedulerProvider);
         mSubscription = new CompositeSubscription();
         fragment.setPresenter(this);
@@ -66,6 +71,7 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     private void handleError(Throwable e) {
+        Gog.e(e.getMessage());
         if (e instanceof BleScanException) {
             fragment.handleBleScanException((BleScanException) e);
         } else if (e instanceof BleAlreadyConnectedException) {
@@ -88,6 +94,7 @@ public class HomePresenter implements HomeContract.Presenter {
         return bleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
     }
 
+    @Override
     public void connectDevice(String s) {
         try {
             if (scanSubscribe != null || scanSubscribe.isUnsubscribed()) {
@@ -109,8 +116,9 @@ public class HomePresenter implements HomeContract.Presenter {
                             if (isCharacteristicNotifiable(characteristic)) {
                                 characteristicUUID = characteristic.getUuid();
                                 connectionObservable = prepareConnectionObservable();
-                                fragment.setNotificationInfo(characteristicUUID, connectionObservable);
-                                connectDevice();
+                                fragment.setCharacteristicUUID(characteristicUUID);
+                                fragment.setBleAddress(s);
+                                toConnect();
                                 break;
                             }
                         }
@@ -118,7 +126,7 @@ public class HomePresenter implements HomeContract.Presenter {
                 }, this::handleError);
     }
 
-    private void connectDevice() {
+    private void toConnect() {
         if (isConnected()) {
             triggerDisconnect();
         } else {
@@ -127,9 +135,7 @@ public class HomePresenter implements HomeContract.Presenter {
                     .flatMap(rxBleDeviceServices -> rxBleDeviceServices.getCharacteristic(characteristicUUID))
                     .observeOn(mSchedulerProvider.ui())
                     .doOnSubscribe(this::connecting)
-                    .subscribe(c -> {
-                        fragment.showConnected(bleDevice);
-                    }, this::handleError);
+                    .subscribe(c -> fragment.showConnected(bleDevice), this::handleError);
         }
     }
 
@@ -137,6 +143,7 @@ public class HomePresenter implements HomeContract.Presenter {
         fragment.isConnecting();
     }
 
+    @Override
     public void startScan() {
         scanSubscribe = rxBleClient.scanBleDevices(new ScanSettings.Builder()
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -178,5 +185,10 @@ public class HomePresenter implements HomeContract.Presenter {
                 .subscribeOn(mSchedulerProvider.io())
                 .subscribe(item -> fragment.handleQualityItemResult(item), e -> fragment.handleError(e));
         mSubscription.add(subscribe);
+    }
+
+    @Override
+    public void reconnect(String macAddress) {
+
     }
 }
