@@ -287,6 +287,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
         if (!initUmMeasureListFlag && unMeasuredList.size() == 0) {
             QualityItem qualityItem = new QualityItem(itemId, resultPartsList);
             mPresenter.uploadResult(qualityItem);
+            resultPartsList.clear();
             Intent intent = new Intent(getActivity(), CaptureActivity.class);
             startActivityForResult(intent, 1001);
         } else {
