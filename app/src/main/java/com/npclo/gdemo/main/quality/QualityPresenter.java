@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.npclo.gdemo.base.BaseApplication;
 import com.npclo.gdemo.data.quality.QualityItem;
-import com.npclo.gdemo.utils.Gog;
 import com.npclo.gdemo.utils.HexString;
 import com.npclo.gdemo.utils.aes.AesException;
 import com.npclo.gdemo.utils.aes.AesUtils;
@@ -87,7 +86,6 @@ public class QualityPresenter implements QualityContract.Presenter {
 
     @Override
     public void reConnect() {
-        Gog.d("isConnected " + isConnected());
         if (isConnected()) {
             triggerDisconnect();
         } else {
@@ -144,7 +142,6 @@ public class QualityPresenter implements QualityContract.Presenter {
 
     private void handleBleResult(byte[] v) {
         String s = HexString.bytesToHex(v);
-        Gog.d("获取到测量结果=======" + s);
         if (s.length() == STANDARD_LENGTH) {
             int code = Integer.parseInt("8D6A", 16);
             int length = Integer.parseInt(s.substring(0, 4), 16);
@@ -176,13 +173,12 @@ public class QualityPresenter implements QualityContract.Presenter {
         } catch (AesException e) {
             e.printStackTrace();
         }
-        Subscription subscribe = new DemoHelper()
+        new DemoHelper()
                 .uploadQualityResult(s1)
                 .subscribeOn(mSchedulerProvider.io())
-//                .observeOn(schedulerProvider.ui())
+                .observeOn(mSchedulerProvider.ui())
                 .subscribe(v -> {
                         }, e -> fragment.handleError(e)
                 );
-        mSubscription.add(subscribe);
     }
 }

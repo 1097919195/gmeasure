@@ -22,7 +22,6 @@ import com.npclo.gdemo.utils.MeasureStateEnum;
 import com.npclo.gdemo.utils.views.MyGridView;
 import com.npclo.gdemo.utils.views.MyLineLayout;
 import com.npclo.gdemo.utils.views.MyTextView;
-import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleGattException;
 
@@ -101,15 +100,15 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
         String macAddress = BaseApplication.getMacAddress(activity);
         if (!TextUtils.isEmpty(macAddress)) {
             RxBleDevice device = BaseApplication.getRxBleClient(activity).getBleDevice(macAddress);
-            if (device != null && device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
+            deName.setText(device.getName());
+            itemMenu.setIcon(R.drawable.ble_connected);
+//            if (device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED) {
                 //启动测量
-                deName.setText(device.getName());
-                itemMenu.setIcon(R.drawable.ble_connected);
                 mPresenter.subscribe();
-            } else {
-                deName.setText(getString(R.string.device_disconnected));
-                mPresenter.reConnect();
-            }
+//            }
+//            else {
+//                mPresenter.reConnect();
+//            }
         }
 
         Bundle bundle = getArguments();
@@ -179,6 +178,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
      */
     @Override
     public void handleMeasureData(int length, float angle, int battery) {
+        itemMenu.setIcon(R.drawable.ble_connected);
         deBattery.setText(battery + "%");
         if (initUmMeasureListFlag) {
             initUnMeasureList();
@@ -314,7 +314,7 @@ public class QualityFragment extends BaseFragment implements QualityContract.Vie
                 break;
             case CODE_HINT:
                 if (result != null) {
-                    mPresenter.getQualityItemInfoWithCode(result);
+                    mPresenter.getQualityItemInfoWithId(result);
                 } else {
                     showToast(getString(R.string.enter_qrcode_error));
                 }
