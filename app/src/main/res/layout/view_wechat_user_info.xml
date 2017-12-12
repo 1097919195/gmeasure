@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_layout"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:id="@+id/user_layout"
-    android:layout_marginTop="16dp"
+    android:layout_marginBottom="16dp"
     android:background="@color/white"
     android:orientation="horizontal">
 
@@ -28,10 +28,10 @@
             android:id="@+id/wechat_nickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="16dp"
             android:text="nickname"
             android:textColor="@color/black"
             android:textSize="16sp" />

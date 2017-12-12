@@ -37,6 +37,7 @@ import com.npclo.imeasurer.data.measure.Measurement;
 import com.npclo.imeasurer.data.measure.item.MeasurementItem;
 import com.npclo.imeasurer.data.measure.item.parts.Part;
 import com.npclo.imeasurer.data.wuser.WechatUser;
+import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.BitmapUtils;
 import com.npclo.imeasurer.utils.Constant;
 import com.npclo.imeasurer.utils.Gog;
@@ -196,7 +197,8 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
 
     private void initToolbar() {
         toolbar.setTitle("量体");
-        navOfToolbar(toolbar);
+        toolbar.setNavigationIcon(R.mipmap.left);
+        toolbar.setNavigationOnClickListener(v -> onHandleBackPress());
         toolbar.inflateMenu(R.menu.base_toolbar_menu);
         toolbar.getMenu().getItem(0).setIcon(R.mipmap.battery_unknown);
     }
@@ -362,9 +364,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         }
         List<Part> data = new ArrayList<>();
         try {
-//            Class class2 = Class.forName(itemPackage + ".MeasurementItem");
-//            MeasurementItem item = (MeasurementItem) class2.newInstance();
-
             for (int i = 0, count = gridView.getCount(); i < count; i++) {
                 MyTextView textView = (MyTextView) ((LinearLayout) gridView.getChildAt(i)).getChildAt(0);
                 if (textView.getState() == MeasureStateEnum.UNMEASUED.ordinal()) {
@@ -376,26 +375,13 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                 String en = textView.getTag().toString();
                 Part part = new Part(cn, en, value + "");
                 data.add(part);
-
-//                Class<?> aClass = Class.forName(partPackage + "." + en);
-//                Part part = (Part) aClass.newInstance();
-//                part.setValue(value + "");
-//                part.setCn(cn);
-//                part.setEn(en);
-//                Method method = class2.getMethod("set" + en, aClass);
-//                method.invoke(item, part);
-
             }
 
             SharedPreferences sharedPreferences = getActivity()
                     .getSharedPreferences(getString(R.string.app_name), Context.MODE_APPEND);
             String cid = sharedPreferences.getString("id", "");
             String oid = sharedPreferences.getString("orgId", "");
-//            if (TextUtils.isEmpty(cid)) {
-//                showToast("账号异常，请重新登录");
-//                startActivity(new Intent(getActivity(), AccountActivity.class));
-//                return;
-//            }
+
             Measurement measurement = new Measurement(user, data, cid, oid);
             MultipartBody.Part[] imgs = new MultipartBody.Part[3];
             if (img1.getDrawable() != null) {
@@ -468,7 +454,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         Gog.e("出错了======" + e.toString());
         if (e instanceof BleGattException) {
             toast2Speech("蓝牙连接断开");
-//             showReConnectDialog();
             measurePresenter.reConnect();
             LogUtils.fixBug("蓝牙断开=>" + e.toString());
         } else {
@@ -592,7 +577,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     public void onGetWechatUserInfoSuccess(WechatUser u) {
         showLoading(false);
         user = u;
-        Gog.d("update user");
         setWechatUserInfo(user);
     }
 
@@ -798,7 +782,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     }
 
     private void startPhotoCrop(Uri imageUri) {
-        Intent intent = new Intent("com.android.camera.action.CROP"); //剪裁
+        Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(imageUri, "image/*");
         intent.putExtra("scale", true);
         //设置宽高比例
@@ -809,11 +793,27 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         intent.putExtra("outputY", 800);
         intent.putExtra("return-data", true);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(intent, CROP_PHOTO); //设置裁剪参数显示图片至ImageView
+        startActivityForResult(intent, CROP_PHOTO);
+        // 设置裁剪参数显示图片至ImageView
     }
 
     @Override
     protected void toast2Speech(String s) {
         speechSynthesizer.playText(s);
+    }
+
+    @Override
+    public boolean onBackPressedSupport() {
+        onHandleBackPress();
+        return true;
+    }
+
+    private void onHandleBackPress() {
+        new MaterialDialog.Builder(getActivity())
+                .title("确定要离开当前量体界面?")
+                .onPositive((d, i) -> startActivity(new Intent(getActivity(), MainActivity.class)))
+                .positiveText(getResources().getString(R.string.sure))
+                .negativeText("点错了")
+                .show();
     }
 }

@@ -3,7 +3,6 @@
     android:id="@+id/measure_table_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="17dp"
     android:background="@color/ddd"
     android:columnWidth="187dp"
     android:horizontalSpacing="1dp"
