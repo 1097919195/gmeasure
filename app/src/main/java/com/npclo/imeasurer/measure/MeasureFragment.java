@@ -34,8 +34,7 @@ import com.npclo.imeasurer.R;
 import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.camera.CaptureActivity;
 import com.npclo.imeasurer.data.measure.Measurement;
-import com.npclo.imeasurer.data.measure.item.MeasurementItem;
-import com.npclo.imeasurer.data.measure.item.parts.Part;
+import com.npclo.imeasurer.data.measure.Part;
 import com.npclo.imeasurer.data.wuser.WechatUser;
 import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.BitmapUtils;
@@ -53,7 +52,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -126,8 +124,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     private MeasureContract.Presenter measurePresenter;
     private WechatUser user;
     private SpeechSynthesizer speechSynthesizer;
-    private String partPackage = Part.class.getPackage().getName();
-    private String itemPackage = MeasurementItem.class.getPackage().getName();
     private MaterialDialog saveProgressbar;
     public static final int TAKE_PHOTO = 13;
     public static final int CROP_PHOTO = 14;
@@ -372,8 +368,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                 }
                 float value = textView.getValue();
                 String cn = textView.getText().toString();
-                String en = textView.getTag().toString();
-                Part part = new Part(cn, en, value + "");
+                Part part = new Part(cn, value);
                 data.add(part);
             }
 
@@ -427,22 +422,10 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
 
     private void initMeasureItemList() {
         try {
-            MeasurementItem item = (MeasurementItem) Class.forName(itemPackage + ".MeasurementItem").newInstance();
-            Field[] declaredFields = item.getClass().getDeclaredFields();// FIXME: 2017/10/18 其实可以不用使用反射，整个测量部位作为一个数组结构
-            List<String> nameList = new ArrayList<>();
-            for (Field field : declaredFields) {
-                String name = field.getName();
-                nameList.add(name);
-            }
-
-            String[] objects = new String[nameList.size()];
-            String[] strings = nameList.toArray(objects);
-            Arrays.sort(strings);
+            String[] strings = getResources().getStringArray(R.array.items_sequence);
             //att 循环添加单行
             for (String name : strings) {
-                Class<?> itemSubclass = Class.forName(partPackage + "." + name);
-                Part part = (Part) itemSubclass.newInstance();
-                partList.add(new Part(part.getCn(), part.getEn()));
+                partList.add(new Part(name));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -610,21 +593,18 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
      * @param type
      */
     private void assignValue(float length, float angle, MyTextView textView, int type) {
-        String tag = (String) textView.getTag();
-        String cn;
+        String cn = textView.getText().toString();
         try {
-            Part part = (Part) Class.forName(partPackage + "." + tag).newInstance();
-            cn = part.getCn();
             String value;  //播报的测量结果
-            if (angleList.contains(tag)) {
+            if (angleList.contains(cn)) {
                 textView.setValue(angle);
                 value = angle + "";
             } else {
                 textView.setValue(length);
                 value = length + "";
             }
-            textView.setState(MeasureStateEnum.MEASURED.ordinal());//更新状态
-            textView.setTextColor(getResources().getColor(R.color.measured));//修改颜色
+            textView.setState(MeasureStateEnum.MEASURED.ordinal());
+            textView.setTextColor(getResources().getColor(R.color.measured));
             String s = null;//最终播放文字
             String result;//播报当前测量结果
             String[] strings = getNextString(type);

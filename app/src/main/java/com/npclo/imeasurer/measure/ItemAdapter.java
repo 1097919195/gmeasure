@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.npclo.imeasurer.R;
-import com.npclo.imeasurer.data.measure.item.parts.Part;
+import com.npclo.imeasurer.data.measure.Part;
 import com.npclo.imeasurer.utils.views.MyTextView;
 
 import java.util.ArrayList;
@@ -54,7 +54,6 @@ public class ItemAdapter extends ArrayAdapter<Part> {
 
         MyTextView textView = holder.textView;
         textView.setText(item.getCn());
-        textView.setTag(item.getEn());
         return convertView;
     }
 

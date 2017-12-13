@@ -13,8 +13,11 @@ import retrofit2.http.POST;
 import retrofit2.http.Part;
 import rx.Observable;
 
+/**
+ * @author Endless
+ */
 public interface AppService {
-    @GET("client/info")
+    @GET("client/info?type=official")
     Observable<HttpResponse<App>> getLatestVersion();
 
     @Multipart

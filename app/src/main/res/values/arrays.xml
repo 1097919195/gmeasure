@@ -53,12 +53,12 @@
         <item>照相选取</item>
     </string-array>
     <string-array name="angle_items">
-        <item>ItemD</item>
-        <item>ItemE</item>
-        <item>ItemF</item>
-        <item>ItemO</item>
-        <item>ItemP</item>
-        <item>ItemN</item>
+        <item>左肩斜</item>
+        <item>右肩斜</item>
+        <item>弯背角度</item>
+        <item>凹腰角度</item>
+        <item>上凸肚角度</item>
+        <item>下凸肚角度</item>
     </string-array>
     <string-array name="items_sequence">
         <item>头围</item>

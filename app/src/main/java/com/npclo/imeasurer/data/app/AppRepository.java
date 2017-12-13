@@ -14,6 +14,7 @@ public class AppRepository implements AppDataSource {
 
     @Override
     public Observable<App> getLatestVersion() {
-        return new AppHttpHelper().getLatestVersion();
+        return new AppHttpHelper()
+                .getLatestVersion();
     }
 }
