@@ -246,7 +246,12 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                 s = unMeasuredList.get(0).getText().toString();
             } else {
                 s2 = "请确定待测人员性别，首先测量部位";
-                s = measureSequence[0];
+                // FIXME: 13/12/2017 语音播报生命周期
+                if (measureSequence == null) {
+                    s = partList.get(0).getCn();
+                } else {
+                    s = measureSequence[0];
+                }
                 firstHint = false;
             }
             speechSynthesizer.playText(s2 + s);
@@ -273,7 +278,9 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @Override
     public void onPause() {
         super.onPause();
-        measurePresenter.unsubscribe();
+        if (measurePresenter != null) {
+            measurePresenter.unsubscribe();
+        }
         if (popupWindow != null) {
             popupWindow.dismiss();
         }
