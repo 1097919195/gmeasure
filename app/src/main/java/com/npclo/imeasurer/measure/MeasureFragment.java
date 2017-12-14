@@ -784,6 +784,12 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        speechSynthesizer = null;
+    }
+
+    @Override
     public boolean onBackPressedSupport() {
         onHandleBackPress();
         return true;
