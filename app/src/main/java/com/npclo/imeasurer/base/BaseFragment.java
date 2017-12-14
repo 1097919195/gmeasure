@@ -16,7 +16,6 @@ import com.npclo.imeasurer.data.app.App;
 import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.ApiException;
 import com.npclo.imeasurer.utils.Gog;
-import com.npclo.imeasurer.utils.LogUtils;
 import com.polidea.rxandroidble.exceptions.BleException;
 
 import java.net.ConnectException;
@@ -102,14 +101,10 @@ public abstract class BaseFragment extends SupportFragment {
         } else if (e instanceof BleException) {
             showToast("蓝牙设备异常，请重试");
             toast2Speech("蓝牙设备异常，请重试");
-            Gog.d("蓝牙异常===" + e.toString());
-            String message = getStackMsg(e);
-            LogUtils.fixBug(message);
+            Gog.e("蓝牙异常===" + e.toString());
         } else {
-//            showToast("出错啦");
             String message = getStackMsg(e);
-            LogUtils.fixBug(message);
-            Gog.d(message);
+            Gog.e(message);
         }
     }
 
