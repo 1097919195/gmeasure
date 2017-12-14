@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
@@ -84,8 +85,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     ImageView wechatIcon;
     @BindView(R.id.wechat_nickname)
     TextView wechatNickname;
-    //    @BindView(R.id.wechat_name)
-//    TextView wechatName;
     @BindView(R.id.wechat_gender)
     TextView wechatGender;
     @BindView(R.id.camera_add)
@@ -136,7 +135,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     private MyTextView modifyingView;
     private boolean initUmMeasureListFlag;
     private Uri imageUri;
-    private boolean firstHint = true;
     private PopupWindow popupWindow;
     private AppCompatTextView popupContentTv;
     private static final int SCAN_HINT = 1001;
@@ -189,6 +187,8 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         measureSequence = getResources().getStringArray(R.array.items_sequence);
 
         initToolbar();
+        //初始化语音播报
+        initSpeech();
     }
 
     private void initToolbar() {
@@ -226,8 +226,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @Override
     public void onResume() {
         super.onResume();
-        //初始化语音播报
-        initSpeech();
         if (measurePresenter != null) {
             measurePresenter.subscribe();
         }
@@ -239,26 +237,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         }
 
         initUmMeasureListFlag = true;
-        if (firstHint) {
-            String s, s2;
-            if (unMeasuredList.size() > 0) {
-                s2 = "当前测量部位";
-                s = unMeasuredList.get(0).getText().toString();
-            } else {
-                s2 = "请确定待测人员性别，首先测量部位";
-                // FIXME: 13/12/2017 语音播报生命周期
-                if (measureSequence == null) {
-                    s = partList.get(0).getCn();
-                } else {
-                    s = measureSequence[0];
-                }
-                firstHint = false;
-            }
-            speechSynthesizer.playText(s2 + s);
-            if (popupContentTv != null) {
-                popupContentTv.setText(s);//更新当前测量部位弹窗显示
-            }
-        }
     }
 
     private void setWechatUserInfo(WechatUser u) {
@@ -284,8 +262,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         if (popupWindow != null) {
             popupWindow.dismiss();
         }
-        firstHint = true;
-        speechSynthesizer = null;
     }
 
     @OnClick({R.id.save_measure_result, R.id.wechat_gender_edit, R.id.camera_add, R.id.next_person,
@@ -428,14 +404,32 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     }
 
     private void initMeasureItemList() {
-        try {
-            String[] strings = getResources().getStringArray(R.array.items_sequence);
-            //att 循环添加单行
-            for (String name : strings) {
-                partList.add(new Part(name));
+        String[] strings = getResources().getStringArray(R.array.items_sequence);
+        for (String name : strings) {
+            partList.add(new Part(name));
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        String s, s2;
+        if (unMeasuredList.size() > 0) {
+            s2 = "当前测量部位";
+            s = unMeasuredList.get(0).getText().toString();
+        } else {
+            s2 = "请确定待测人员性别，首先测量部位";
+            // FIXME: 13/12/2017 语音播报生命周期
+            if (measureSequence == null) {
+                s = partList.get(0).getCn();
+            } else {
+                s = measureSequence[0];
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        speechSynthesizer.playText(s2 + s);
+        if (popupContentTv != null) {
+            popupContentTv.setText(s);
+            //更新当前测量部位弹窗显示
         }
     }
 
@@ -701,7 +695,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                 intentBc1.setData(imageUri);
                 getActivity().sendBroadcast(intentBc1);
                 Bitmap bitmap = BitmapUtils.decodeUri(getActivity(), imageUri, 800, 800);//att 获得小预览图
-                FrameLayout frameLayout = unVisibleView.get(0);
+                FrameLayout frameLayout = unVisibleView.get(0); // FIXME: 14/12/2017 出现数组越界问题
                 ImageView imageView = (ImageView) frameLayout.getChildAt(0);
                 if (bitmap != null) {
                     imageView.setImageBitmap(bitmap);
