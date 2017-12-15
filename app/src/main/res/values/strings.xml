@@ -55,7 +55,7 @@
     <string name="curr_times">本月量体：</string>
     <string name="user_hint">某某</string>
     <string name="prompt_user_manage">账户管理</string>
-    <string name="prompt_link_device">连接设备</string>
+    <string name="prompt_link_device">连接智能尺</string>
     <string name="prompt_update">检查更新</string>
     <string name="prompt_latest_version">已经最新版</string>
     <string name="prompt_use_help">使用说明</string>
