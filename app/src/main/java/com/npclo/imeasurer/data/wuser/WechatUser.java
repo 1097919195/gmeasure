@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Created by Endless on 2017/8/14.
+ *
+ * @author Endless
+ * @date 2017/8/14
  */
 
 public class WechatUser implements Parcelable {
@@ -22,6 +24,8 @@ public class WechatUser implements Parcelable {
     private String avatar;
     @NonNull
     private String name;
+    @Nullable
+    private int times;
 
     protected WechatUser(Parcel in) {
         gender = in.readInt();
@@ -31,6 +35,7 @@ public class WechatUser implements Parcelable {
         openID = in.readString();
         avatar = in.readString();
         name = in.readString();
+        times = in.readInt();
     }
 
     public static final Creator<WechatUser> CREATOR = new Creator<WechatUser>() {
@@ -44,6 +49,15 @@ public class WechatUser implements Parcelable {
             return new WechatUser[size];
         }
     };
+
+    @Nullable
+    public int getTimes() {
+        return times;
+    }
+
+    public void setTimes(@Nullable int times) {
+        this.times = times;
+    }
 
     @NonNull
     public String getName() {
@@ -125,5 +139,6 @@ public class WechatUser implements Parcelable {
         parcel.writeString(openID);
         parcel.writeString(avatar);
         parcel.writeString(name);
+        parcel.writeInt(times);
     }
 }

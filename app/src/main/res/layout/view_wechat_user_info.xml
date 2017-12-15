@@ -36,17 +36,17 @@
             android:textColor="@color/black"
             android:textSize="16sp" />
 
-        <!--<TextView-->
-        <!--android:id="@+id/wechat_name"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_vertical"-->
-        <!--android:layout_marginLeft="10dp"-->
-        <!--android:layout_marginStart="10dp"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:text="微信号：name"-->
-        <!--android:textColor="@color/black"-->
-        <!--android:textSize="14sp" />-->
+        <TextView
+            android:id="@+id/user_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:text="新量体用户"
+            android:textColor="@color/ff5001"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout

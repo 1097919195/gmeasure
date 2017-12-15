@@ -80,6 +80,8 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     ImageView wechatIcon;
     @BindView(R.id.wechat_nickname)
     TextView wechatNickname;
+    @BindView(R.id.user_label)
+    TextView userLabel;
     @BindView(R.id.wechat_gender)
     TextView wechatGender;
     @BindView(R.id.camera_add)
@@ -253,6 +255,9 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
             Glide.with(this).load(u.getAvatar()).into(wechatIcon);
         } else {
             wechatIcon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+        }
+        if (u.getTimes() > 0) {
+            userLabel.setText("用户已量体" + u.getTimes() + "次");
         }
     }
 
@@ -434,7 +439,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @Override
     public void onHandleMeasureError(Throwable e) {
         if (e instanceof BleGattException) {
-//            toast2Speech("蓝牙连接断开");
+            toast2Speech("智能尺重新连接中");
             measurePresenter.reConnect();
         } else {
             super.onHandleError(e);
