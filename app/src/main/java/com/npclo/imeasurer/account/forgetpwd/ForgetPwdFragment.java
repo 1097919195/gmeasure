@@ -1,4 +1,4 @@
-package com.npclo.imeasurer.account.forgetPwd;
+package com.npclo.imeasurer.account.forgetpwd;
 
 import android.content.Context;
 import android.content.Intent;
