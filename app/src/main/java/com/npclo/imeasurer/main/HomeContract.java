@@ -38,7 +38,7 @@ public interface HomeContract {
 
         void showCompleteGetInfo();
 
-        void onGetVersionInfo(App app);
+        void onGetVersionInfo(App app, String type);
 
         void onGetVersionError(Throwable e);
 

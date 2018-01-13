@@ -13,13 +13,13 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.npclo.imeasurer.R;
 import com.npclo.imeasurer.account.AccountActivity;
-import com.npclo.imeasurer.base.BaseApplication;
 import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.camera.CaptureActivity;
 import com.npclo.imeasurer.data.App;
 import com.npclo.imeasurer.data.WechatUser;
 import com.npclo.imeasurer.data.ble.BleDevice;
 import com.npclo.imeasurer.measure.MeasureActivity;
+import com.npclo.imeasurer.utils.Constant;
 import com.npclo.imeasurer.utils.LogUtils;
 import com.npclo.imeasurer.utils.PreferencesUtils;
 import com.polidea.rxandroidble.RxBleDevice;
@@ -105,11 +105,8 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        if (BaseApplication.getFirstCheckHint(getActivity())) {
-            if (mPresenter != null) {
-                mPresenter.subscribe(); // FIXME: 2017/12/8 app闲置后  mPresenter对象为空
-            }
-            BaseApplication.setIsFirstCheck(getActivity());
+        if (mPresenter != null) {
+            mPresenter.subscribe(); // FIXME: 2017/12/8 app闲置后  mPresenter对象为空
         }
         LogUtils.upload(getActivity());
     }
@@ -167,12 +164,14 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     }
 
     @Override
-    public void onGetVersionInfo(App app) {
+    public void onGetVersionInfo(App app, String type) {
         int code = getVersionCode();
         if (app.getCode() > code && code != 0) {
             updateApp(app);
         } else {
-            showToast("已经是最新版");
+            if (Constant.MANUAL.equals(type)) {
+                showToast("已经是最新版");
+            }
         }
     }
 

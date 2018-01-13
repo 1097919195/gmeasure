@@ -133,7 +133,6 @@ public abstract class BaseFragment extends SupportFragment {
     }
 
     protected void updateApp(App app) {
-        BaseApplication.haveUpdate(getActivity(), true);
         UpdateAppUtils.from(getActivity())
                 .serverVersionCode(app.getCode())
                 .serverVersionName(app.getVersion())

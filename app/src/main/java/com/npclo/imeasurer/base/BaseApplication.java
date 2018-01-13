@@ -9,15 +9,12 @@ import com.polidea.rxandroidble.internal.RxBleLog;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
- *
  * @author Endless
  * @date 2017/7/19
  */
 
 public class BaseApplication extends Application {
     private RxBleClient rxBleClient;
-    private boolean haveUpdate = false;
-    private boolean isFirstCheckUpdate = true;
     public static Context AppContext;
 
     public static RxBleClient getRxBleClient(Context context) {
@@ -33,7 +30,6 @@ public class BaseApplication extends Application {
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
-            // TODO: 2017/8/28 heap analysis
             return;
         }
         LeakCanary.install(this);
@@ -42,31 +38,5 @@ public class BaseApplication extends Application {
         //att 处理app crash
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
-    }
-
-    /*=================TODO  elegant handle this=====================**/
-
-    /**
-     * @param context
-     * @param b
-     */
-    public static void haveUpdate(Context context, boolean b) {
-        BaseApplication application = ((BaseApplication) context.getApplicationContext());
-        application.haveUpdate = b;
-    }
-
-    public static boolean canUpdate(Context context) {
-        BaseApplication application = ((BaseApplication) context.getApplicationContext());
-        return application.haveUpdate;
-    }
-
-    public static void setIsFirstCheck(Context context) {
-        BaseApplication application = ((BaseApplication) context.getApplicationContext());
-        application.isFirstCheckUpdate = false;
-    }
-
-    public static boolean getFirstCheckHint(Context context) {
-        BaseApplication application = ((BaseApplication) context.getApplicationContext());
-        return application.isFirstCheckUpdate;
     }
 }
