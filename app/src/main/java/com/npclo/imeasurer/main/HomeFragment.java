@@ -163,6 +163,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         Intent intent = new Intent(getActivity(), MeasureActivity.class);
         intent.putExtra("userBundle", bundle);
         startActivity(intent);
+        getActivity().finish();
     }
 
     @Override

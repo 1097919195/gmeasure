@@ -2,6 +2,7 @@ package com.npclo.imeasurer.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Window;
@@ -21,10 +22,11 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         String token = PreferencesUtils.getInstance(this).getToken(true);
+        Handler handler = new Handler();
         if (!TextUtils.isEmpty(token)) {
-            goToMain();
+            handler.postDelayed(this::goToMain, 500);
         } else {
-            goToSignIn();
+            handler.postDelayed(this::goToSignIn, 500);
         }
     }
 

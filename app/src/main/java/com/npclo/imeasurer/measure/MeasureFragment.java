@@ -792,7 +792,10 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     private void onHandleBackPress() {
         new MaterialDialog.Builder(getActivity())
                 .title("确定要离开当前量体界面?")
-                .onPositive((d, i) -> startActivity(new Intent(getActivity(), MainActivity.class)))
+                .onPositive((d, i) -> {
+                    startActivity(new Intent(getActivity(), MainActivity.class));
+                    getActivity().finish();
+                })
                 .positiveText(getResources().getString(R.string.sure))
                 .negativeText("点错了")
                 .show();

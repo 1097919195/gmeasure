@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.Toolbar;
 import android.view.Window;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.color.CircleView;
 import com.npclo.imeasurer.R;
@@ -35,19 +34,19 @@ public abstract class BaseActivity extends SupportActivity {
     protected void beforeInit() {
     }
 
-    @Override
-    public void onBackPressedSupport() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
-            pop();
-        } else {
-            if (System.currentTimeMillis() - touchTime < WAIT_TIME) {
-                finish();
-            } else {
-                touchTime = System.currentTimeMillis(); // FIXME: 2017/9/21 再按一次退出
-                Toast.makeText(this, R.string.press_again_exit, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    @Override
+//    public void onBackPressedSupport() {
+//        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+//            pop();
+//        } else {
+//            if (System.currentTimeMillis() - touchTime < WAIT_TIME) {
+//                finish();
+//            } else {
+//                touchTime = System.currentTimeMillis(); // FIXME: 2017/9/21 再按一次退出
+//                Toast.makeText(this, R.string.press_again_exit, Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     protected void initToolBar(Toolbar toolbar, boolean homeAsUpEnabled, String title) {
