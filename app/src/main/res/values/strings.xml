@@ -62,9 +62,9 @@
     <string name="prompt_feedback">反馈</string>
     <string name="prompt_contact">联系我们</string>
     <string name="prompt_app_help">联系电话：0575-85595213</string>
-    <string name="enter_old_pwd">&#160;输入旧密码</string>
-    <string name="enter_new_pwd">&#160;重置新密码</string>
-    <string name="enter_new_pwd2">&#160;确认新密码</string>
+    <string name="enter_old_pwd">输入旧密码</string>
+    <string name="enter_new_pwd">重置新密码</string>
+    <string name="enter_new_pwd2">确认新密码</string>
     <string name="sure_edit">确认修改</string>
     <string name="edit_pwd">修改密码</string>
     <string name="hint_feedback">问题描述：</string>
