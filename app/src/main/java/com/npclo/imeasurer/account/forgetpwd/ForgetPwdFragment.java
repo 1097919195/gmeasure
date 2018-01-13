@@ -1,8 +1,6 @@
 package com.npclo.imeasurer.account.forgetpwd;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -18,6 +16,7 @@ import com.npclo.imeasurer.account.signin.SignInFragment;
 import com.npclo.imeasurer.account.signin.SignInPresenter;
 import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.data.ValidCode;
+import com.npclo.imeasurer.utils.PreferencesUtils;
 import com.npclo.imeasurer.utils.schedulers.SchedulerProvider;
 
 import butterknife.BindView;
@@ -192,15 +191,14 @@ public class ForgetPwdFragment extends BaseFragment implements ForgetPwdContract
 
     @Override
     public void showResetPwdSuccess() {
-        //att 重置密码成功，需要重新登录
         showToast(getString(R.string.reset_pwd_success));
-        SharedPreferences sharedPreferences = getActivity()
-                .getSharedPreferences(getString(R.string.app_name), Context.MODE_APPEND);
-        SharedPreferences.Editor edit = sharedPreferences.edit();
-        edit.putBoolean("loginState", false);
-        edit.apply();
-        Intent intent = new Intent(getActivity(), AccountActivity.class);
-        getActivity().startActivity(intent);
+        PreferencesUtils.getInstance(getActivity()).setToken("");
+        PreferencesUtils.getInstance(getActivity()).setLoginPwd(pwd1);
+        (new android.os.Handler()).postDelayed(() -> {
+            Intent intent = new Intent(getActivity(), AccountActivity.class);
+            getActivity().startActivity(intent);
+            getActivity().finish();
+        }, 1000);
     }
 
     @Override
