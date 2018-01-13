@@ -57,7 +57,6 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public void subscribe() {
         updateUserInfo();
-        autoGetLatestVersion();
     }
 
     private void updateUserInfo() {
