@@ -25,7 +25,6 @@ public class AccountActivity extends SupportActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.act_account);
 
-        // TODO: 2017/8/29 初始化登录fragment
         SignInFragment fragment = findFragment(SignInFragment.class);
         if (fragment == null) {
             fragment = SignInFragment.newInstance();

@@ -126,7 +126,6 @@ public class SignInFragment extends BaseFragment implements SignInContract.View 
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.logo:
-                // TODO: 2017/8/30 link to the website
                 break;
             case R.id.input_eye:
                 if (pwdLabel) {

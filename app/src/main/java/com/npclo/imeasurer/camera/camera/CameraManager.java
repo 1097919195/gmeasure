@@ -82,7 +82,7 @@ public final class CameraManager {
             try {
                 theCamera = OpenCameraInterface.open(requestedCameraId);
             } catch (Exception e) {
-                e.printStackTrace();//// TODO: 2017/9/1 未授予应用摄像机权限
+                e.printStackTrace();
             }
             if (theCamera == null) {
                 throw new IOException("Camera.open() failed to return object from driver");
@@ -334,7 +334,6 @@ public final class CameraManager {
 //        // Go ahead and assume it's YUV rather than die.
 //        return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
 //                rect.width(), rect.height(), false);
-        //att 采集的二维码数据不再拘束于聚集框，二维码数据可以铺满整个屏幕。
         return new PlanarYUVLuminanceSource(data, width, height, 0, 0, width, height, false);
     }
 

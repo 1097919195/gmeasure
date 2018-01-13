@@ -54,7 +54,6 @@ final class DecodeHandler extends Handler {
 //        multiFormatReader.setHints(hints);
 //        this.activity = activity;
 //    }
-    //att 改为目标识别格式为二维码
     DecodeHandler(CaptureActivity activity) {
         this.activity = activity;
         mHints = new Hashtable<>();

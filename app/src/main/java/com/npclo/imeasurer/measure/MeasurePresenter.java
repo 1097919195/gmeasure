@@ -135,7 +135,6 @@ public class MeasurePresenter implements MeasureContract.Presenter {
 
     @Override
     public void reConnect() {
-        //att 判断之前是否已连接测量设备
 //        if (!isConnected()) {
 //            startMeasure();
 //        }

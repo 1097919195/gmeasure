@@ -78,7 +78,7 @@ public class ForgetPwdFragment extends BaseFragment implements ForgetPwdContract
         RxTextView
                 .textChanges(inputMobile)
                 .subscribe(sequence -> {
-                    if (sequence.length() == 11) { // TODO: 2017/8/31 校验手机号格式等
+                    if (sequence.length() == 11) {
                         actionValidCode.setEnabled(true);
                         actionValidCode.setBackground(getResources().getDrawable(R.drawable.btn_radius_solid_primary));
                         actionValidCode.setTextColor(getResources().getColor(R.color.white));

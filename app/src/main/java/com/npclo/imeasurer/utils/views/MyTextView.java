@@ -11,7 +11,6 @@ import com.npclo.imeasurer.utils.MeasureStateEnum;
 
 public class MyTextView extends AppCompatTextView {
     private float value;
-    //FIXME 该条目的测量状态，未测，已测，正在修改等。。。
     private int state = MeasureStateEnum.UNMEASUED.ordinal();
 
     public MyTextView(Context context) {

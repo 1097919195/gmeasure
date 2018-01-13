@@ -28,7 +28,6 @@ public class SignInPresenter implements SignInContract.Presenter {
 
     @Override
     public void subscribe() {
-        // TODO: 2017/8/30 maybe have bug
     }
 
     @Override

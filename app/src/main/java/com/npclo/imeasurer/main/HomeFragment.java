@@ -107,7 +107,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     public void onResume() {
         super.onResume();
         if (mPresenter != null) {
-            mPresenter.subscribe(); // FIXME: 2017/12/8 app闲置后  mPresenter对象为空
+            mPresenter.subscribe();
         }
         boolean currentDayFirst = PreferencesUtils.getInstance(getActivity()).isCurrentDayFirst(getTodayStr());
         if (currentDayFirst) {

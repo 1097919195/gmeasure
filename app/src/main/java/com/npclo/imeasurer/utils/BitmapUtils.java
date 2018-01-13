@@ -20,7 +20,6 @@ public class BitmapUtils {
         options.inJustDecodeBounds = true; //只读取图片尺寸
         resolveUri(context, uri, options);
 
-        //计算实际缩放比例， att 宽高分别的缩放比例  // FIXME: 2017/9/26 是否需要动态计算缩放比例
         int scale = 1;
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
 

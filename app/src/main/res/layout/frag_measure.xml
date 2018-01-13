@@ -29,7 +29,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="48dp">
-        <!--TODO 修改这种布局-->
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/save_measure_result"
             android:layout_width="match_parent"

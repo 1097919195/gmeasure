@@ -51,14 +51,12 @@ final class CameraConfigurationManager {
     }
 
     /**
-     * att 解决图形拉伸问题
      * Reads, one time, values from the camera that are needed by the app.
      */
     void initFromCameraParameters(OpenCamera camera) {
         Camera.Parameters parameters = camera.getCamera().getParameters();
         WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
-        //att 判断屏幕方向，是否有需要从自然角度旋转到显示器角度
         int displayRotation = display.getRotation();
         int cwRotationFromNaturalToDisplay;
         switch (displayRotation) {

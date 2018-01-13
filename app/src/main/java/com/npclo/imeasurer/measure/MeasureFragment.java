@@ -172,7 +172,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
             if (textView.getState() == MeasureStateEnum.MEASURED.ordinal()) {
                 textView.setTextColor(getResources().getColor(R.color.modifying));
                 textView.setState(MeasureStateEnum.MODIFYING.ordinal());
-                popupContentTv.setText(cn);//设置当前修改部位弹窗显示   // FIXME: 2017/10/17 下一个测量弹窗不显示
+                popupContentTv.setText(cn);//设置当前修改部位弹窗显示
                 speechSynthesizer.playText("重新测量部位" + cn);
                 modifyingView = textView;
             }
@@ -485,7 +485,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         if (initUmMeasureListFlag) {
             initUnMeasureList();
         }
-        //att 先判断是否有正处于修改状态的textview，有的话，先给其赋值，再给下一个未测量的部位赋值
         if (modifyingView != null) {
             assignValue(length, angle, modifyingView, 1);
         } else {

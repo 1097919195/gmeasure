@@ -158,7 +158,6 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View 
             case R.id.action_valid_code:
                 String mobile = inputMobile.getText().toString();
                 if (mobile.length() == 0 || mobile.length() != 11) {
-                    // TODO: 2017/8/30 check mobile number valid
                     showToast(getString(R.string.plz_valid_mobile));
                     return;
                 }

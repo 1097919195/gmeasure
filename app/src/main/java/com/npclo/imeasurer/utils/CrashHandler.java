@@ -65,7 +65,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
         try {
-            //导出异常信息到外部存储中 // FIXME: 2017/9/22 存到外部存储中
+            //导出异常信息到外部存储中
             dumpExceptionToExternalStorage(ex);
             //这里可以通过网络上传异常信息到服务器，便于开发人员分析日志从而解决bug
             uploadExceptionToServer();
@@ -143,7 +143,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     }
 
     private void uploadExceptionToServer() {
-        //TODO Upload Exception Message To Your Web Server
         LogUtils.upload(mContext);
     }
 

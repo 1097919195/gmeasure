@@ -42,7 +42,7 @@ public abstract class BaseActivity extends SupportActivity {
 //            if (System.currentTimeMillis() - touchTime < WAIT_TIME) {
 //                finish();
 //            } else {
-//                touchTime = System.currentTimeMillis(); // FIXME: 2017/9/21 再按一次退出
+//                touchTime = System.currentTimeMillis();
 //                Toast.makeText(this, R.string.press_again_exit, Toast.LENGTH_SHORT).show();
 //            }
 //        }
