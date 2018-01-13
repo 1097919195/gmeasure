@@ -138,7 +138,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void updateBlueToothState(String name) {
         //先清除蓝牙设备信息菜单项
         navView.getMenu().removeItem(R.id.nav_device);
-        navView.getMenu().add(R.id.device, R.id.nav_device, 0, "连接智能尺(已绑定: " + name + ")")
+        navView.getMenu().add(R.id.device, R.id.nav_device, 0, "连接智能尺(已绑定)")
                 .setIcon(R.drawable.ic_blueteeth_connected);
     }
 

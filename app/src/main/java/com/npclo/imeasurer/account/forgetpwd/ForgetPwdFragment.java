@@ -6,7 +6,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -31,10 +30,7 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
  * @author Endless
  */
 public class ForgetPwdFragment extends BaseFragment implements ForgetPwdContract.View {
-    private static String TAG = ForgetPwdFragment.class.getSimpleName();
     @BindView(R.id.support_frag_toolbar)
-    TextView baseToolbarTitle;
-    @BindView(R.id.base_toolbar)
     Toolbar baseToolbar;
     @BindView(R.id.input_mobile)
     EditText inputMobile;
@@ -93,7 +89,8 @@ public class ForgetPwdFragment extends BaseFragment implements ForgetPwdContract
                     }
                 });
         baseToolbar.setNavigationIcon(R.mipmap.left);
-        baseToolbarTitle.setText(getString(R.string.forget_pwd));
+        baseToolbar.setTitle(getString(R.string.forget_pwd));
+
         //返回登录界面
         baseToolbar.setNavigationOnClickListener(v -> {
             SignInFragment signInFragment = SignInFragment.newInstance();

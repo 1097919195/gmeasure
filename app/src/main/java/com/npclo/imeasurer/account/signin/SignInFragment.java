@@ -2,7 +2,6 @@ package com.npclo.imeasurer.account.signin;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.AppCompatButton;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
@@ -10,20 +9,14 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.npclo.imeasurer.R;
-import com.npclo.imeasurer.account.forgetpwd.ForgetPwdFragment;
-import com.npclo.imeasurer.account.forgetpwd.ForgetPwdPresenter;
-import com.npclo.imeasurer.account.signup.SignUpFragment;
-import com.npclo.imeasurer.account.signup.SignUpPresenter;
 import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.PreferencesUtils;
-import com.npclo.imeasurer.utils.schedulers.SchedulerProvider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,12 +37,12 @@ public class SignInFragment extends BaseFragment implements SignInContract.View 
     ImageView inputEye;
     @BindView(R.id.action_remember_pwd)
     CheckBox actionRememberPwd;
-    @BindView(R.id.action_sign_in)
-    AppCompatButton actionSignIn;
-    @BindView(R.id.forget_pwd_tv)
-    TextView forgetPwdTv;
-    @BindView(R.id.signup_tv)
-    TextView signupTv;
+    //    @BindView(R.id.action_sign_in)
+//    AppCompatButton actionSignIn;
+//    @BindView(R.id.forget_pwd_tv)
+//    TextView forgetPwdTv;
+//    @BindView(R.id.signup_tv)
+//    TextView signupTv;
     @BindView(R.id.action_wechat_login)
     ImageView actionWechatLogin;
     @BindView(R.id.sign_in_frag)
@@ -70,13 +63,17 @@ public class SignInFragment extends BaseFragment implements SignInContract.View 
     @Override
     public void onResume() {
         super.onResume();
-        signinPresenter.subscribe();
+        if (signinPresenter != null) {
+            signinPresenter.subscribe();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        signinPresenter.unsubscribe();
+        if (signinPresenter != null) {
+            signinPresenter.unsubscribe();
+        }
     }
 
     @Override
@@ -125,7 +122,7 @@ public class SignInFragment extends BaseFragment implements SignInContract.View 
     }
 
     @OnClick({R.id.logo, R.id.input_eye, R.id.action_remember_pwd, R.id.action_sign_in,
-            R.id.forget_pwd_tv, R.id.signup_tv, R.id.action_wechat_login})
+            R.id.action_wechat_login})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.logo:
@@ -149,18 +146,18 @@ public class SignInFragment extends BaseFragment implements SignInContract.View 
                 }
                 signinPresenter.signIn(name, password);
                 break;
-            case R.id.forget_pwd_tv:
-                ForgetPwdFragment fragment = ForgetPwdFragment.newInstance();
-                start(fragment, SINGLETASK);
-                fragment.setPresenter(new ForgetPwdPresenter(fragment,
-                        SchedulerProvider.getInstance()));
-                break;
-            case R.id.signup_tv:
-                SignUpFragment signUpFragment = SignUpFragment.newInstance();
-                start(signUpFragment, SINGLETASK);
-                signUpFragment.setPresenter(new SignUpPresenter(signUpFragment,
-                        SchedulerProvider.getInstance()));
-                break;
+//            case R.id.forget_pwd_tv:
+//                ForgetPwdFragment fragment = ForgetPwdFragment.newInstance();
+//                start(fragment, SINGLETASK);
+//                fragment.setPresenter(new ForgetPwdPresenter(fragment,
+//                        SchedulerProvider.getInstance()));
+//                break;
+//            case R.id.signup_tv:
+//                SignUpFragment signUpFragment = SignUpFragment.newInstance();
+//                start(signUpFragment, SINGLETASK);
+//                signUpFragment.setPresenter(new SignUpPresenter(signUpFragment,
+//                        SchedulerProvider.getInstance()));
+//                break;
             case R.id.action_wechat_login:
                 showToast("待开放微信登录");
                 break;
