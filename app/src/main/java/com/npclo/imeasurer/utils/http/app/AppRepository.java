@@ -1,6 +1,6 @@
-package com.npclo.imeasurer.data.app;
+package com.npclo.imeasurer.utils.http.app;
 
-import com.npclo.imeasurer.utils.http.app.AppHttpHelper;
+import com.npclo.imeasurer.data.App;
 
 import rx.Observable;
 

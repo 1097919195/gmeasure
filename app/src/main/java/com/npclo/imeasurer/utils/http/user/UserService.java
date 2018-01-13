@@ -3,8 +3,8 @@ package com.npclo.imeasurer.utils.http.user;
 import com.npclo.imeasurer.data.HttpMsg;
 import com.npclo.imeasurer.data.HttpResponse;
 import com.npclo.imeasurer.data.ValidCode;
-import com.npclo.imeasurer.data.user.User;
-import com.npclo.imeasurer.data.wuser.WechatUser;
+import com.npclo.imeasurer.data.User;
+import com.npclo.imeasurer.data.WechatUser;
 
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -20,7 +20,7 @@ import rx.Observable;
 public interface UserService {
     @FormUrlEncoded
     @POST("clientUser/signIn")
-    Observable<HttpResponse<User>> signIn(@Field("name") String name, @Field("pwd") String pwd);
+    Observable<HttpResponse<HttpMsg>> signIn(@Field("name") String name, @Field("pwd") String pwd);
 
     @FormUrlEncoded
     @POST("clientUser/signUp")
@@ -36,13 +36,17 @@ public interface UserService {
                                                @Field("code") String code);
 
     @GET("clientUser/getInfoWithQrcode")
-    Observable<HttpResponse<WechatUser>> getUserInfoWithCode(@Query("code") String code, @Query("uid") String uid);
+    Observable<HttpResponse<WechatUser>> getUserInfoWithCode(@Query("code") String code);
 
     @FormUrlEncoded
     @POST("clientUser/editPwd")
-    Observable<HttpResponse<HttpMsg>> editPwd(@Field("id") String id, @Field("old") String old,
+    Observable<HttpResponse<HttpMsg>> editPwd(@Field("old") String old,
                                               @Field("new") String newpwd);
 
     @GET("clientUser/getInfoWithOpenID")
-    Observable<HttpResponse<WechatUser>> getUserInfoWithOpenID(@Query("openid") String id, @Query("uid") String uid);
+    Observable<HttpResponse<WechatUser>> getUserInfoWithOpenID(@Query("openid") String id);
+
+    @GET("clientUser/userinfo")
+    Observable<HttpResponse<User>> userinfo();
+
 }

@@ -2,7 +2,7 @@ package com.npclo.imeasurer.account.signup;
 
 import android.support.annotation.NonNull;
 
-import com.npclo.imeasurer.data.user.UserRepository;
+import com.npclo.imeasurer.utils.http.user.UserRepository;
 import com.npclo.imeasurer.utils.schedulers.BaseSchedulerProvider;
 
 import rx.Subscription;

@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.npclo.imeasurer.data.measure.Measurement;
-import com.npclo.imeasurer.data.user.UserRepository;
+import com.npclo.imeasurer.utils.http.user.UserRepository;
 import com.npclo.imeasurer.utils.HexString;
 import com.npclo.imeasurer.utils.aes.AesException;
 import com.npclo.imeasurer.utils.aes.AesUtils;

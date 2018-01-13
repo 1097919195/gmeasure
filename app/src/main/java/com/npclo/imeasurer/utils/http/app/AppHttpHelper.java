@@ -1,7 +1,7 @@
 package com.npclo.imeasurer.utils.http.app;
 
 import com.npclo.imeasurer.data.HttpMsg;
-import com.npclo.imeasurer.data.app.App;
+import com.npclo.imeasurer.data.App;
 import com.npclo.imeasurer.utils.http.HttpHelper;
 
 import java.io.File;

@@ -3,8 +3,10 @@ package com.npclo.imeasurer.base;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.npclo.imeasurer.R;
-import com.npclo.imeasurer.data.app.App;
+import com.npclo.imeasurer.account.AccountActivity;
+import com.npclo.imeasurer.data.App;
 import com.npclo.imeasurer.main.MainActivity;
-import com.npclo.imeasurer.utils.ApiException;
 import com.npclo.imeasurer.utils.Gog;
+import com.npclo.imeasurer.utils.exception.ApiException;
+import com.npclo.imeasurer.utils.exception.TimeoutException;
 import com.polidea.rxandroidble.exceptions.BleException;
 
 import java.net.ConnectException;
@@ -32,6 +36,7 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
  */
 public abstract class BaseFragment extends SupportFragment {
     protected View mRootView;
+    private Handler handler = new android.os.Handler();
 
     @Nullable
     @Override
@@ -81,7 +86,11 @@ public abstract class BaseFragment extends SupportFragment {
     }
 
     protected void showSnackbar(String text) {
-        Snackbar.make(checkNotNull(getView()), text, Snackbar.LENGTH_SHORT).show();
+        Snackbar snackbar = Snackbar.make(checkNotNull(getView()), text, Snackbar.LENGTH_SHORT);
+        snackbar.setActionTextColor(getResources().getColor(R.color.white));
+        View view = snackbar.getView();
+        view.setBackgroundColor(getResources().getColor(R.color.primary));
+        snackbar.show();
     }
 
     /**
@@ -98,6 +107,9 @@ public abstract class BaseFragment extends SupportFragment {
             showToast(getString(R.string.service_down));
         } else if (e instanceof ApiException) {
             showToast(e.getMessage());
+        } else if (e instanceof TimeoutException) {
+            showToast(e.getMessage());
+            handler.postDelayed(this::goToSignIn, 1000);
         } else if (e instanceof BleException) {
             showToast("蓝牙设备异常，请重试");
             toast2Speech("蓝牙设备异常，请重试");
@@ -150,4 +162,9 @@ public abstract class BaseFragment extends SupportFragment {
         return sb.toString();
     }
 
+    private void goToSignIn() {
+        FragmentActivity activity = getActivity();
+        startActivity(new Intent(activity, AccountActivity.class));
+        activity.finish();
+    }
 }

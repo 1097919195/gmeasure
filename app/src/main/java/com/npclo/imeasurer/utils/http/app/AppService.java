@@ -2,7 +2,7 @@ package com.npclo.imeasurer.utils.http.app;
 
 import com.npclo.imeasurer.data.HttpMsg;
 import com.npclo.imeasurer.data.HttpResponse;
-import com.npclo.imeasurer.data.app.App;
+import com.npclo.imeasurer.data.App;
 
 import okhttp3.RequestBody;
 import retrofit2.http.Field;

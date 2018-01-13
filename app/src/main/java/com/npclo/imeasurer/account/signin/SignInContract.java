@@ -2,7 +2,7 @@ package com.npclo.imeasurer.account.signin;
 
 import com.npclo.imeasurer.base.BasePresenter;
 import com.npclo.imeasurer.base.BaseView;
-import com.npclo.imeasurer.data.user.User;
+import com.npclo.imeasurer.data.User;
 
 /**
  * @author Endless
@@ -18,6 +18,8 @@ public interface SignInContract {
         void completeSignIn();
 
         void showLoading(boolean bool);
+
+        void saveToken(String msg);
     }
 
     interface Presenter extends BasePresenter {

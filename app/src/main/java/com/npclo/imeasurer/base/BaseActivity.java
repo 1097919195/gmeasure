@@ -1,8 +1,6 @@
 package com.npclo.imeasurer.base;
 
 import android.app.ActivityManager;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -11,13 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Window;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.color.CircleView;
 import com.npclo.imeasurer.R;
-import com.npclo.imeasurer.account.AccountActivity;
 import com.npclo.imeasurer.utils.Constant;
 import com.npclo.imeasurer.utils.SettingUtil;
 
@@ -30,12 +26,6 @@ public abstract class BaseActivity extends SupportActivity {
 
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        checkLogin();
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -43,16 +33,6 @@ public abstract class BaseActivity extends SupportActivity {
     }
 
     protected void beforeInit() {
-    }
-
-    private void checkLogin() {
-        SharedPreferences loginState = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
-        boolean isLogin = loginState.getBoolean("loginState", false);
-        String uid = loginState.getString("id", "");
-        if (!isLogin && TextUtils.isEmpty(uid)) {
-            Intent intent = new Intent(this, AccountActivity.class);
-            startActivity(intent);
-        }
     }
 
     @Override

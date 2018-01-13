@@ -2,7 +2,7 @@ package com.npclo.imeasurer.user.manage;
 
 import android.support.annotation.NonNull;
 
-import com.npclo.imeasurer.data.user.UserRepository;
+import com.npclo.imeasurer.utils.http.user.UserRepository;
 import com.npclo.imeasurer.utils.schedulers.BaseSchedulerProvider;
 
 import rx.Subscription;
@@ -40,9 +40,9 @@ public class ManagePresenter implements ManageContract.Presenter {
     }
 
     @Override
-    public void resetPwd(String id, String old, String newpwd) {
+    public void resetPwd(String old, String newpwd) {
         Subscription subscribe = new UserRepository()
-                .editPwd(id, old, newpwd)
+                .editPwd(old, newpwd)
                 .subscribeOn(provider.io())
                 .observeOn(provider.ui())
                 .doOnSubscribe(() -> fragment.showLoading(true))

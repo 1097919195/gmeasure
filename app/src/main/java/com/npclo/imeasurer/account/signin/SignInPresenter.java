@@ -2,7 +2,7 @@ package com.npclo.imeasurer.account.signin;
 
 import android.support.annotation.NonNull;
 
-import com.npclo.imeasurer.data.user.UserRepository;
+import com.npclo.imeasurer.utils.http.user.UserRepository;
 import com.npclo.imeasurer.utils.schedulers.BaseSchedulerProvider;
 
 import rx.Subscription;
@@ -38,13 +38,19 @@ public class SignInPresenter implements SignInContract.Presenter {
 
     @Override
     public void signIn(String name, String pwd) {
-        Subscription subscribe = new UserRepository().signIn(name, pwd)
+        Subscription subscribe = new UserRepository()
+                .signIn(name, pwd)
+                .flatMap(res -> {
+                    String msg = res.getMsg();
+                    mView.saveToken(msg);
+                    return new UserRepository().userInfo();
+                })
                 .subscribeOn(mSchedulerProvider.io())
                 .observeOn(mSchedulerProvider.ui())
                 .doOnSubscribe(() -> mView.showLoading(true))
-                .subscribe(user -> mView.showSignInSuccess(user),
-                        e -> mView.showSignInError(e),
-                        () -> mView.completeSignIn());
+                .subscribe(mView::showSignInSuccess,
+                        mView::showSignInError,
+                        mView::completeSignIn);
         mSubscriptions.add(subscribe);
     }
 }

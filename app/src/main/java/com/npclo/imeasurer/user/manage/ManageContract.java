@@ -5,7 +5,7 @@ import com.npclo.imeasurer.base.BaseView;
 
 public interface ManageContract {
     interface Presenter extends BasePresenter {
-        void resetPwd(String id, String old, String newpwd);
+        void resetPwd(String old, String newpwd);
     }
 
     interface View extends BaseView<Presenter> {

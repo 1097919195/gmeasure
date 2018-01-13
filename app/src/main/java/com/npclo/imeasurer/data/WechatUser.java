@@ -1,4 +1,4 @@
-package com.npclo.imeasurer.data.wuser;
+package com.npclo.imeasurer.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

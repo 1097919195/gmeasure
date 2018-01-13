@@ -8,6 +8,15 @@ package com.npclo.imeasurer.data.measure;
 public class Part {
     private String cn;
     private float value;
+    private boolean isAngle = false;
+
+    public boolean isAngle() {
+        return isAngle;
+    }
+
+    public void setAngle(boolean angle) {
+        isAngle = angle;
+    }
 
     public Part(String cn) {
         this.cn = cn;

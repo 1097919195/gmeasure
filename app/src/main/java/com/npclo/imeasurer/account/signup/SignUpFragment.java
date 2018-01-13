@@ -18,7 +18,7 @@ import com.npclo.imeasurer.account.signin.SignInFragment;
 import com.npclo.imeasurer.account.signin.SignInPresenter;
 import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.data.ValidCode;
-import com.npclo.imeasurer.data.user.User;
+import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.schedulers.SchedulerProvider;
 
@@ -98,7 +98,7 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View 
                 .getSharedPreferences(getString(R.string.app_name), Context.MODE_APPEND);
         SharedPreferences.Editor edit = sharedPreferences.edit();
         edit.putBoolean("loginState", true);
-        edit.putString("id", user.get_id());
+        edit.putString("id", user.getId());
         edit.putString("name", user.getName());
         edit.putString("nickname", user.getNickname());
         edit.putString("orgId", user.getOrgId());

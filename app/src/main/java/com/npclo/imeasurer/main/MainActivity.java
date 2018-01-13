@@ -18,11 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
 import com.npclo.imeasurer.R;
 import com.npclo.imeasurer.base.BaseActivity;
 import com.npclo.imeasurer.base.BaseApplication;
+import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.user.UserActivity;
 import com.npclo.imeasurer.utils.Constant;
+import com.npclo.imeasurer.utils.PreferencesUtils;
 import com.npclo.imeasurer.utils.schedulers.SchedulerProvider;
 import com.unisound.client.SpeechConstants;
 import com.unisound.client.SpeechSynthesizer;
@@ -41,12 +44,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private String macAddress;
     private String deviceName;
     public SpeechSynthesizer speechSynthesizer;
+    private TextView currTimesView;
+    private TextView totalTimesView;
+    private TextView userNameView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
         init();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         initSpeech();
     }
 
@@ -103,24 +114,27 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void initDrawerMenuContent() {
         //判断是否已绑定设备
-        SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name), MODE_APPEND);
-        macAddress = preferences.getString("mac_address", null);
+        PreferencesUtils instance = PreferencesUtils.getInstance(this);
+        //判断是否已绑定设备
+        macAddress = instance.getMacAddress();
+
         if (TextUtils.isEmpty(macAddress)) {
             navView.getMenu().add(R.id.device, R.id.nav_device, 0, "连接智能尺").setIcon(R.drawable.ic_blueteeth_unconnected);
         } else {
-            deviceName = preferences.getString("device_name", null);
+            deviceName = instance.getDeviceName();
             updateBlueToothState(deviceName);
         }
         View headerView = navView.getHeaderView(0);
-        TextView currTimes = (TextView) headerView.findViewById(R.id.curr_times);
-        TextView totalTimes = (TextView) headerView.findViewById(R.id.total_times);
-        TextView userName = (TextView) headerView.findViewById(R.id.user_name);
-        // FIXME: 2017/12/5 非永久性数据应使用缓存
-        currTimes.setText(preferences.getString("currTimes", "N/A"));
-        totalTimes.setText(preferences.getString("totalTimes", "N/A"));
-        String name = preferences.getString("name", "N/A");
-        String nickname = preferences.getString("nickname", "");
-        userName.setText(!TextUtils.isEmpty(nickname) ? nickname : name);
+        currTimesView = headerView.findViewById(R.id.curr_times);
+        totalTimesView = headerView.findViewById(R.id.total_times);
+        userNameView = headerView.findViewById(R.id.user_name);
+
+        currTimesView.setText(String.valueOf(instance.getCurrTimes()));
+        totalTimesView.setText(String.valueOf(instance.getTotalTimes()));
+        String name = instance.getUserName();
+        String nickname = instance.getUserNickname();
+
+        userNameView.setText(!TextUtils.isEmpty(nickname) ? nickname : name);
     }
 
     public void updateBlueToothState(String name) {
@@ -212,5 +226,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 break;
         }
         return false;
+    }
+
+    public void updateUserinfoView(User user) {
+        currTimesView.setText(String.valueOf(user.getCurrTimes()));
+        totalTimesView.setText(String.valueOf(user.getTotalTimes()));
+        userNameView.setText(!TextUtils.isEmpty(user.getNickname()) ? user.getNickname() : user.getName());
     }
 }

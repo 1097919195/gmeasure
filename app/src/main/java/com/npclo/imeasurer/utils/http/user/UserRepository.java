@@ -1,9 +1,9 @@
-package com.npclo.imeasurer.data.user;
+package com.npclo.imeasurer.utils.http.user;
 
 import com.npclo.imeasurer.data.HttpMsg;
+import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.data.ValidCode;
-import com.npclo.imeasurer.data.wuser.WechatUser;
-import com.npclo.imeasurer.utils.http.user.UserHttpHelper;
+import com.npclo.imeasurer.data.WechatUser;
 
 import rx.Observable;
 
@@ -13,10 +13,14 @@ import rx.Observable;
 
 public class UserRepository implements UserDataSource {
     @Override
-    public Observable<User> signIn(String name, String pwd) {
+    public Observable<HttpMsg> signIn(String name, String pwd) {
         return new UserHttpHelper().signIn(name, pwd);
     }
 
+    @Override
+    public Observable<User> userInfo() {
+        return new UserHttpHelper().userInfo();
+    }
     @Override
     public Observable<User> signUp(String name, String pwd, String code) {
         return new UserHttpHelper().signUp(name, pwd, code);
@@ -31,16 +35,16 @@ public class UserRepository implements UserDataSource {
         return new UserHttpHelper().resetPwd(mobile, pwd, code);
     }
 
-    public Observable<WechatUser> getUserInfoWithCode(String code, String uid) {
-        return new UserHttpHelper().getUserInfoWithCode(code, uid);
+    public Observable<WechatUser> getUserInfoWithCode(String code) {
+        return new UserHttpHelper().getUserInfoWithCode(code);
     }
 
-    public Observable<HttpMsg> editPwd(String id, String old, String newpwd) {
-        return new UserHttpHelper().editPwd(id, old, newpwd);
+    public Observable<HttpMsg> editPwd(String old, String newpwd) {
+        return new UserHttpHelper().editPwd(old, newpwd);
     }
 
-    public Observable<WechatUser> getUserInfoWithOpenID(String oid, String uid) {
-        return new UserHttpHelper().getUserInfoWithOpenID(oid, uid);
+    public Observable<WechatUser> getUserInfoWithOpenID(String oid) {
+        return new UserHttpHelper().getUserInfoWithOpenID(oid);
     }
 
 }

@@ -35,7 +35,7 @@ import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.camera.CaptureActivity;
 import com.npclo.imeasurer.data.measure.Measurement;
 import com.npclo.imeasurer.data.measure.Part;
-import com.npclo.imeasurer.data.wuser.WechatUser;
+import com.npclo.imeasurer.data.WechatUser;
 import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.BitmapUtils;
 import com.npclo.imeasurer.utils.Constant;

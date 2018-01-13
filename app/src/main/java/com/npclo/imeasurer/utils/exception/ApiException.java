@@ -1,4 +1,4 @@
-package com.npclo.imeasurer.utils;
+package com.npclo.imeasurer.utils.exception;
 
 /**
  * Created by Endless on 2017/7/11.

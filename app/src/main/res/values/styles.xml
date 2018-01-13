@@ -30,4 +30,10 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!--<style name="AppWelcome" parent="android:Theme.Translucent.NoTitleBar.Fullscreen"/>-->
+
+    <style name="AppWelcome" parent="AppTheme">
+        <item name="android:windowBackground">@mipmap/background</item>
+    </style>
 </resources>

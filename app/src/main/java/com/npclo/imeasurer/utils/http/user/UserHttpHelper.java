@@ -1,15 +1,15 @@
 package com.npclo.imeasurer.utils.http.user;
 
 import com.npclo.imeasurer.data.HttpMsg;
-import com.npclo.imeasurer.data.user.User;
+import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.data.ValidCode;
-import com.npclo.imeasurer.data.wuser.WechatUser;
+import com.npclo.imeasurer.data.WechatUser;
 import com.npclo.imeasurer.utils.http.HttpHelper;
 
 import rx.Observable;
 
 public class UserHttpHelper extends HttpHelper {
-    public Observable<User> signIn(String name, String pwd) {
+    public Observable<HttpMsg> signIn(String name, String pwd) {
         return retrofit.create(UserService.class)
                 .signIn(name, pwd)
                 .map(new HttpResponseFunc<>());
@@ -33,21 +33,27 @@ public class UserHttpHelper extends HttpHelper {
                 .map(new HttpResponseFunc<>());
     }
 
-    public Observable<WechatUser> getUserInfoWithCode(String code, String uid) {
+    public Observable<WechatUser> getUserInfoWithCode(String code) {
         return retrofit.create(UserService.class)
-                .getUserInfoWithCode(code, uid)
+                .getUserInfoWithCode(code)
                 .map(new HttpResponseFunc<>());
     }
 
-    public Observable<HttpMsg> editPwd(String id, String old, String newpwd) {
+    public Observable<HttpMsg> editPwd(String old, String newpwd) {
         return retrofit.create(UserService.class)
-                .editPwd(id, old, newpwd)
+                .editPwd(old, newpwd)
                 .map(new HttpResponseFunc<>());
     }
 
-    public Observable<WechatUser> getUserInfoWithOpenID(String oid, String uid) {
+    public Observable<WechatUser> getUserInfoWithOpenID(String oid) {
         return retrofit.create(UserService.class)
-                .getUserInfoWithOpenID(oid, uid)
+                .getUserInfoWithOpenID(oid)
+                .map(new HttpResponseFunc<>());
+    }
+
+    public Observable<User> userInfo() {
+        return retrofit.create(UserService.class)
+                .userinfo()
                 .map(new HttpResponseFunc<>());
     }
 }

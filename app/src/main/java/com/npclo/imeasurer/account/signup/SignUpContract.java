@@ -2,7 +2,7 @@ package com.npclo.imeasurer.account.signup;
 
 import com.npclo.imeasurer.base.BasePresenter;
 import com.npclo.imeasurer.base.BaseView;
-import com.npclo.imeasurer.data.user.User;
+import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.data.ValidCode;
 
 /**

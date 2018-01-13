@@ -7,7 +7,7 @@
     <string name="signup_prompt">立即注册</string>
     <string name="name_enter_valid">用户名输入无效</string>
     <string name="pwd_enter_valid">请输入6-20位长度的密码</string>
-    <string name="login_success_hint">登录成功！</string>
+    <string name="login_success_hint">登录成功</string>
     <string name="action_sign_up">注册</string>
     <string name="have_account">已有账号？去登录</string>
     <string name="prompt_name">请输入账号名</string>
