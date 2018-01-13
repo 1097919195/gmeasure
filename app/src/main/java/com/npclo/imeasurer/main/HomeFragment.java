@@ -1,8 +1,6 @@
 package com.npclo.imeasurer.main;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -19,10 +17,11 @@ import com.npclo.imeasurer.base.BaseApplication;
 import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.camera.CaptureActivity;
 import com.npclo.imeasurer.data.App;
-import com.npclo.imeasurer.data.ble.BleDevice;
 import com.npclo.imeasurer.data.WechatUser;
+import com.npclo.imeasurer.data.ble.BleDevice;
 import com.npclo.imeasurer.measure.MeasureActivity;
 import com.npclo.imeasurer.utils.LogUtils;
+import com.npclo.imeasurer.utils.PreferencesUtils;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.scan.ScanResult;
@@ -184,14 +183,14 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     @Override
     public void onLogout() {
-        // FIXME: 2017/12/5 修改保存登录状态
-        SharedPreferences.Editor edit = getActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_APPEND).edit();
-        edit.putBoolean("loginState", false);
-        edit.putString("id", "");
-        edit.apply();
-        Toast.makeText(getActivity(), getString(R.string.logout_success), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getActivity(), AccountActivity.class);
-        startActivity(intent);
+        // 退出登录，清除id和token
+        MainActivity activity = (MainActivity) getActivity();
+        PreferencesUtils instance = PreferencesUtils.getInstance(activity);
+        instance.setToken("");
+        Toast.makeText(activity, getString(R.string.logout_success), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(activity, AccountActivity.class);
+        activity.startActivity(intent);
+        activity.finish();
     }
 
     @Override
@@ -276,24 +275,15 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     @Override
     public void onSetNotificationUUID(UUID uuid) {
-        SharedPreferences.Editor edit = getActivity().getSharedPreferences(getString(R.string.app_name),
-                Context.MODE_APPEND).edit();
-        edit.putString("uuid", uuid.toString());
-        edit.apply();
+        PreferencesUtils.getInstance(getActivity()).setDeviceUuid(uuid.toString());
     }
 
     private void setBleAddress(String s) {
-        SharedPreferences preferences = getActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_APPEND);
-        SharedPreferences.Editor edit = preferences.edit();
-        edit.putString("mac_address", s);
-        edit.apply();
+        PreferencesUtils.getInstance(getActivity()).setMacAddress(s);
     }
 
     private void setBleDeviceName(String name) {
-        SharedPreferences preferences = getActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_APPEND);
-        SharedPreferences.Editor edit = preferences.edit();
-        edit.putString("device_name", name);
-        edit.apply();
+        PreferencesUtils.getInstance(getActivity()).setDeviceName(name);
     }
 
     @Override
@@ -323,20 +313,17 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle bundle = data.getExtras();
         String result = bundle.getString("result");
-        String uid = getActivity().getSharedPreferences(getString(R.string.app_name),
-                Context.MODE_APPEND).getString("id", null);
-        // FIXME: 10/12/2017 是否为永久性数据
         switch (resultCode) {
             case SCAN_HINT:
                 if (result != null) {
-                    mPresenter.getUserInfoWithOpenID(result, uid);
+                    mPresenter.getUserInfoWithOpenID(result);
                 } else {
                     showToast(getString(R.string.scan_qrcode_failed));
                 }
                 break;
             case CODE_HINT:
                 if (result != null) {
-                    mPresenter.getUserInfoWithCode(result, uid);
+                    mPresenter.getUserInfoWithCode(result);
                 } else {
                     showToast(getString(R.string.enter_qrcode_error));
                 }
@@ -348,5 +335,10 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     private SpeechSynthesizer getSynthesizer() {
         return ((MainActivity) getActivity()).speechSynthesizer;
+    }
+
+    @Override
+    public void onUpdateUserInfoError(Throwable e) {
+        onHandleError(e);
     }
 }

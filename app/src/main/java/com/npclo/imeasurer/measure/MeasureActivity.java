@@ -1,7 +1,5 @@
 package com.npclo.imeasurer.measure;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -10,6 +8,7 @@ import android.widget.Toast;
 import com.npclo.imeasurer.R;
 import com.npclo.imeasurer.base.BaseActivity;
 import com.npclo.imeasurer.base.BaseApplication;
+import com.npclo.imeasurer.utils.PreferencesUtils;
 import com.npclo.imeasurer.utils.schedulers.SchedulerProvider;
 import com.polidea.rxandroidble.RxBleDevice;
 
@@ -41,15 +40,15 @@ public class MeasureActivity extends BaseActivity {
         if (measureFragment == null) {
             measureFragment = MeasureFragment.newInstance();
             loadRootFragment(R.id.content_frame, measureFragment);
-            SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
-                    Context.MODE_APPEND);
-            int offsetMeasure = preferences.getInt("measure_offset", 14);
-            String address = preferences.getString("mac_address", null);
-            String uuid = preferences.getString("uuid", null);
-            if (!TextUtils.isEmpty(address) && !TextUtils.isEmpty(uuid)) {
-                RxBleDevice device = BaseApplication.getRxBleClient(this).getBleDevice(address);
-                new MeasurePresenter(measureFragment, SchedulerProvider.getInstance(), offsetMeasure,
-                        address, device, UUID.fromString(uuid));
+            PreferencesUtils instance = PreferencesUtils.getInstance(this);
+            float measureOffset = instance.getMeasureOffset();
+            String macAddress = instance.getMacAddress();
+            String deviceUuid = instance.getDeviceUuid();
+
+            if (!TextUtils.isEmpty(macAddress) && !TextUtils.isEmpty(deviceUuid)) {
+                RxBleDevice device = BaseApplication.getRxBleClient(this).getBleDevice(macAddress);
+                new MeasurePresenter(measureFragment, SchedulerProvider.getInstance(), measureOffset,
+                        macAddress, device, UUID.fromString(deviceUuid));
             } else {
                 Toast.makeText(this, "未连接蓝牙设备", Toast.LENGTH_SHORT).show();
             }

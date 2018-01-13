@@ -30,6 +30,11 @@ public class Part {
         this.value = value;
     }
 
+    public Part(String cn, boolean isAngle) {
+        this.cn = cn;
+        this.isAngle = isAngle;
+    }
+
     public String getCn() {
         return cn;
     }

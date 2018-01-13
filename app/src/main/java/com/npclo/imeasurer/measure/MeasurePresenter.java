@@ -5,11 +5,10 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.npclo.imeasurer.data.measure.Measurement;
-import com.npclo.imeasurer.utils.http.user.UserRepository;
 import com.npclo.imeasurer.utils.HexString;
-import com.npclo.imeasurer.utils.aes.AesException;
 import com.npclo.imeasurer.utils.aes.AesUtils;
 import com.npclo.imeasurer.utils.http.measurement.MeasurementHelper;
+import com.npclo.imeasurer.utils.http.user.UserRepository;
 import com.npclo.imeasurer.utils.schedulers.BaseSchedulerProvider;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
@@ -43,11 +42,11 @@ public class MeasurePresenter implements MeasureContract.Presenter {
     private PublishSubject<Void> disconnectTriggerSubject = PublishSubject.create();
     private UUID uuid;
     private String macAddress;
-    private int offset;
+    private float offset;
     private Observable<RxBleConnection> connectionObservable;
 
     public MeasurePresenter(@NonNull MeasureContract.View view, @NonNull BaseSchedulerProvider schedulerProvider,
-                            int offsetMeasure, String address, RxBleDevice bleDevice, @NonNull UUID u) {
+                            float offsetMeasure, String address, RxBleDevice bleDevice, @NonNull UUID u) {
         fragment = checkNotNull(view);
         this.schedulerProvider = checkNotNull(schedulerProvider);
         mSubscriptions = new CompositeSubscription();
@@ -93,19 +92,9 @@ public class MeasurePresenter implements MeasureContract.Presenter {
     @Override
     public void saveMeasurement(Measurement measurement, MultipartBody.Part[] imgs) {
         String s = (new Gson()).toJson(measurement);
-        if (aesUtils == null) {
-            aesUtils = new AesUtils();
-        }
-        String s1 = null;
-        String nonce = aesUtils.getRandomStr();
-        String timeStamp = Long.toString(System.currentTimeMillis());
-        try {
-            s1 = aesUtils.encryptMsg(s, timeStamp, nonce);
-        } catch (AesException e) {
-            e.printStackTrace();
-        }
+
         Subscription subscribe = new MeasurementHelper()
-                .saveMeasurement(s1, imgs)
+                .saveMeasurement(s, imgs)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .doOnSubscribe(() -> fragment.showLoading(true))
@@ -117,9 +106,9 @@ public class MeasurePresenter implements MeasureContract.Presenter {
     }
 
     @Override
-    public void getUserInfoWithOpenID(String id, String uid) {
+    public void getUserInfoWithOpenID(String id) {
         Subscription subscribe = new UserRepository()
-                .getUserInfoWithOpenID(id, uid)
+                .getUserInfoWithOpenID(id)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .doOnSubscribe(() -> fragment.showLoading(true))
@@ -131,9 +120,9 @@ public class MeasurePresenter implements MeasureContract.Presenter {
     }
 
     @Override
-    public void getUserInfoWithCode(String code, String uid) {
+    public void getUserInfoWithCode(String code) {
         Subscription subscribe = new UserRepository()
-                .getUserInfoWithCode(code, uid)
+                .getUserInfoWithCode(code)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .doOnSubscribe(() -> fragment.showLoading(true))

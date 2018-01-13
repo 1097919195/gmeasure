@@ -2,7 +2,6 @@ package com.npclo.imeasurer.main;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.bumptech.glide.Glide;
 import com.npclo.imeasurer.R;
 import com.npclo.imeasurer.base.BaseActivity;
 import com.npclo.imeasurer.base.BaseApplication;
@@ -193,10 +191,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         .inputType(InputType.TYPE_CLASS_NUMBER)
                         .input(R.string.input_offset_hint, R.string.default_value, (dialog, offset) -> {
                             dialog.dismiss();
-                            SharedPreferences.Editor edit = getSharedPreferences(getString(R.string.app_name),
-                                    MODE_APPEND).edit();
-                            edit.putInt("measure_offset", Integer.parseInt(offset.toString()));
-                            edit.apply();
+                            PreferencesUtils.getInstance(this).setMeasureOffset(Float.parseFloat(offset.toString()));
                         }).show();
                 drawerLayout.closeDrawers();
                 break;

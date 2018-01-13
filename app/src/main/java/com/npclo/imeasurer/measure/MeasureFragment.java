@@ -1,8 +1,6 @@
 package com.npclo.imeasurer.measure;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -33,9 +31,9 @@ import com.bumptech.glide.Glide;
 import com.npclo.imeasurer.R;
 import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.camera.CaptureActivity;
+import com.npclo.imeasurer.data.WechatUser;
 import com.npclo.imeasurer.data.measure.Measurement;
 import com.npclo.imeasurer.data.measure.Part;
-import com.npclo.imeasurer.data.WechatUser;
 import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.BitmapUtils;
 import com.npclo.imeasurer.utils.Constant;
@@ -158,10 +156,13 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @Override
     protected void initView(View mRootView) {
         unbinder = ButterKnife.bind(this, mRootView);
+        //初始化需要测量角度的部位
+        angleList = initMeasureAnglePartsList();
         //渲染测量部位列表
-        initMeasureItemList();
+        initMeasureItemList(angleList);
         ItemAdapter adapter = new ItemAdapter(getActivity(), R.layout.list_measure_item, (ArrayList<Part>) partList);
-        gridView.setAdapter(adapter);// TODO: 2017/9/4 使用RecyclerView替代
+        gridView.setAdapter(adapter);
+        // TODO: 2017/9/4 使用RecyclerView替代
         // FIXME: 2017/9/8 notifyItemChanged 部分绑定
         gridView.setOnItemClickListener((AdapterView<?> var1, View view, int position, long var4) -> {
             resetTextViewClickState();
@@ -180,15 +181,18 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         unVisibleView.add(frame1);
         unVisibleView.add(frame2);
         unVisibleView.add(frame3);
-        //初始化需要测量角度的部位
-        String[] angleItems = getResources().getStringArray(R.array.angle_items);
-        angleList = Arrays.asList(angleItems);
+
         //初始化所有测量部位
         measureSequence = getResources().getStringArray(R.array.items_sequence);
 
         initToolbar();
         //初始化语音播报
         initSpeech();
+    }
+
+    private List<String> initMeasureAnglePartsList() {
+        String[] preArray = getResources().getStringArray(R.array.angle_items);
+        return new ArrayList<>(Arrays.asList(preArray));
     }
 
     private void initToolbar() {
@@ -367,12 +371,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                 data.add(part);
             }
 
-            SharedPreferences sharedPreferences = getActivity()
-                    .getSharedPreferences(getString(R.string.app_name), Context.MODE_APPEND);
-            String cid = sharedPreferences.getString("id", "");
-            String oid = sharedPreferences.getString("orgId", "");
-
-            Measurement measurement = new Measurement(user, data, cid, oid);
+            Measurement measurement = new Measurement(user, data);
             MultipartBody.Part[] imgs = new MultipartBody.Part[3];
             if (img1.getDrawable() != null) {
                 imgs[0] = getSpecialBodyTypePic((String) img1.getTag());
@@ -411,10 +410,14 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         speechSynthesizer.init(null);
     }
 
-    private void initMeasureItemList() {
+    private void initMeasureItemList(List<String> angleList) {
         String[] strings = getResources().getStringArray(R.array.items_sequence);
         for (String name : strings) {
-            partList.add(new Part(name));
+            if (angleList.contains(name)) {
+                partList.add(new Part(name, true));
+            } else {
+                partList.add(new Part(name, false));
+            }
         }
     }
 
@@ -642,8 +645,6 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String uid = getActivity().getSharedPreferences(getString(R.string.app_name),
-                Context.MODE_APPEND).getString("id", null);
         switch (requestCode) {
             case IMAGE_REQUEST_CODE:
                 startPhotoCrop(data.getData());
@@ -706,7 +707,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                     e.printStackTrace();
                 }
                 if (id != null) {
-                    measurePresenter.getUserInfoWithOpenID(id, uid);
+                    measurePresenter.getUserInfoWithOpenID(id);
                 } else {
                     showToast(getString(R.string.scan_qrcode_failed));
                 }
@@ -720,7 +721,7 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
                     e.printStackTrace();
                 }
                 if (code != null) {
-                    measurePresenter.getUserInfoWithCode(code, uid);
+                    measurePresenter.getUserInfoWithCode(code);
                 } else {
                     showToast(getString(R.string.enter_qrcode_error));
                 }

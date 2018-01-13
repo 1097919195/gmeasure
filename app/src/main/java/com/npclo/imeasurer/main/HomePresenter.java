@@ -55,8 +55,18 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void subscribe() {
-        // TODO: 2017/12/5 获取用户最新量体统计数据   使用token
+        updateUserInfo();
         autoGetLatestVersion();
+    }
+
+    private void updateUserInfo() {
+        Subscription subscribe = new UserRepository()
+                .userInfo()
+                .subscribeOn(mSchedulerProvider.io())
+                .observeOn(mSchedulerProvider.ui())
+                .subscribe(user -> ((MainActivity) ((HomeFragment) fragment).getActivity()).updateUserinfoView(user),
+                        e -> fragment.onUpdateUserInfoError(e));
+        mSubscriptions.add(subscribe);
     }
 
     @Override
@@ -77,12 +87,12 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void startScan() {
-        // TODO: 2017/12/5 筛选特定名字的蓝牙设备
         scanSubscribe = rxBleClient.scanBleDevices(new ScanSettings.Builder()
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                 .build(), new ScanFilter.Builder().build())
                 //蓝牙名不为空
+                // TODO: 2017/12/5 筛选特定名字的蓝牙设备
                 .filter(s -> !TextUtils.isEmpty(s.getBleDevice().getName()))
                 .observeOn(mSchedulerProvider.ui())
                 .doOnSubscribe(this::onScanning)
@@ -101,7 +111,7 @@ public class HomePresenter implements HomeContract.Presenter {
         } else if (e instanceof BleAlreadyConnectedException) {
             fragment.onShowError("重复连接，请检查");
         } else {
-            fragment.onHandleError(e);
+            ((HomeFragment) fragment).onHandleError(e);
         }
     }
 
@@ -118,9 +128,9 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     @Override
-    public void getUserInfoWithCode(String result, String uid) {
+    public void getUserInfoWithCode(String result) {
         Subscription subscribe = new UserRepository()
-                .getUserInfoWithCode(result, uid)
+                .getUserInfoWithCode(result)
                 .subscribeOn(mSchedulerProvider.io())
                 .observeOn(mSchedulerProvider.ui())
                 .doOnSubscribe(() -> fragment.showLoading(true))
@@ -132,9 +142,9 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     @Override
-    public void getUserInfoWithOpenID(String oid, String uid) {
+    public void getUserInfoWithOpenID(String oid) {
         Subscription subscribe = new UserRepository()
-                .getUserInfoWithOpenID(oid, uid)
+                .getUserInfoWithOpenID(oid)
                 .subscribeOn(mSchedulerProvider.io())
                 .observeOn(mSchedulerProvider.ui())
                 .doOnSubscribe(() -> fragment.showLoading(true))
@@ -210,7 +220,7 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     private void onHandleConnectError(Throwable e) {
-        fragment.onHandleError(e);
+        ((HomeFragment) fragment).onHandleError(e);
     }
 
     private void connectDevice(UUID uuid) {

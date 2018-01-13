@@ -40,17 +40,20 @@ public class ItemAdapter extends ArrayAdapter<Part> {
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         ViewHolder holder;
+        Part item = mGridData.get(position);
 
         if (convertView == null) {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
             convertView = inflater.inflate(layoutResourceId, null, false);
             holder = new ViewHolder();
-            holder.textView = (MyTextView) convertView.findViewById(R.id.tv);
+            holder.textView = convertView.findViewById(R.id.tv);
+            if (item.isAngle()) {
+                holder.textView.setBackgroundColor(parent.getResources().getColor(R.color.primary_lighter));
+            }
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        Part item = mGridData.get(position);
 
         MyTextView textView = holder.textView;
         textView.setText(item.getCn());
