@@ -64,6 +64,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             speechSynthesizer = new SpeechSynthesizer(this, Constant.APP_KEY, Constant.APP_SECRET);
         }
         speechSynthesizer.setOption(SpeechConstants.TTS_SERVICE_MODE, SpeechConstants.TTS_SERVICE_MODE_NET);
+        speechSynthesizer.setOption(SpeechConstants.TTS_KEY_VOICE_SPEED, 70);
         speechSynthesizer.init(null);
     }
 
