@@ -28,6 +28,7 @@ import com.polidea.rxandroidble.scan.ScanResult;
 import com.unisound.client.SpeechSynthesizer;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -108,7 +109,19 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         if (mPresenter != null) {
             mPresenter.subscribe(); // FIXME: 2017/12/8 app闲置后  mPresenter对象为空
         }
+        boolean currentDayFirst = PreferencesUtils.getInstance(getActivity()).isCurrentDayFirst(getTodayStr());
+        if (currentDayFirst) {
+            mPresenter.autoGetLatestVersion();
+        }
         LogUtils.upload(getActivity());
+    }
+
+    private String getTodayStr() {
+        Calendar instance = Calendar.getInstance();
+        String year = String.valueOf(instance.get(Calendar.YEAR));
+        String month = String.valueOf(instance.get(Calendar.MONTH) + 1);
+        String day = String.valueOf(instance.get(Calendar.DAY_OF_MONTH));
+        return year + month + day;
     }
 
     @Override
@@ -166,6 +179,9 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     @Override
     public void onGetVersionInfo(App app, String type) {
         int code = getVersionCode();
+        if (Constant.AUTO.equals(type)) {
+            PreferencesUtils.getInstance(getActivity()).setCurrentDate(getTodayStr());
+        }
         if (app.getCode() > code && code != 0) {
             updateApp(app);
         } else {

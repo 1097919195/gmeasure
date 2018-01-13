@@ -50,7 +50,7 @@ public final class PreferencesUtils {
     }
 
     public boolean isCurrentDayFirst(String str) {
-        return mPreferences.getString(CURRENT_DATE, "").equals(str);
+        return !mPreferences.getString(CURRENT_DATE, "").equals(str);
     }
 
     public void setCurrentDate(String str) {
