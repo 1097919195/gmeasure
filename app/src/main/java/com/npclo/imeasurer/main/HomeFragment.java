@@ -327,25 +327,29 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bundle bundle = data.getExtras();
-        String result = bundle.getString("result");
-        switch (resultCode) {
-            case SCAN_HINT:
-                if (result != null) {
-                    mPresenter.getUserInfoWithOpenID(result);
-                } else {
-                    showToast(getString(R.string.scan_qrcode_failed));
-                }
-                break;
-            case CODE_HINT:
-                if (result != null) {
-                    mPresenter.getUserInfoWithCode(result);
-                } else {
-                    showToast(getString(R.string.enter_qrcode_error));
-                }
-                break;
-            default:
-                break;
+        if (data != null) {
+            Bundle bundle = data.getExtras();
+            String result = bundle.getString("result");
+            switch (resultCode) {
+                case SCAN_HINT:
+                    if (result != null) {
+                        mPresenter.getUserInfoWithOpenID(result);
+                    } else {
+                        showToast(getString(R.string.scan_qrcode_failed));
+                    }
+                    break;
+                case CODE_HINT:
+                    if (result != null) {
+                        mPresenter.getUserInfoWithCode(result);
+                    } else {
+                        showToast(getString(R.string.enter_qrcode_error));
+                    }
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            showToast(getString(R.string.enter_qrcode_error));
         }
     }
 
