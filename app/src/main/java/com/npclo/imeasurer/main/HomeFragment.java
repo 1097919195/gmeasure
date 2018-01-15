@@ -348,8 +348,6 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
                 default:
                     break;
             }
-        } else {
-            showToast(getString(R.string.enter_qrcode_error));
         }
     }
 
