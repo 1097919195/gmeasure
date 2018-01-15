@@ -115,8 +115,10 @@ public abstract class BaseFragment extends SupportFragment {
             toast2Speech("蓝牙设备异常，请重试");
             Gog.e("蓝牙异常===" + e.toString());
         } else {
-            String message = getStackMsg(e);
-            Gog.e(message);
+//            String message = getStackMsg(e);
+//            Gog.e(message);
+            showToast("登录超时，请重新登录");
+            handler.postDelayed(this::goToSignIn, 1000);
         }
     }
 
