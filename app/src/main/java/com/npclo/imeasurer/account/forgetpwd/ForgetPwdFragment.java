@@ -1,4 +1,4 @@
-package com.npclo.imeasurer.account.forgetpwd;
+package com.npclo.imeasurer.account.forgetPwd;
 
 import android.content.Intent;
 import android.support.v7.widget.AppCompatButton;

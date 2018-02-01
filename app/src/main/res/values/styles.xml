@@ -34,6 +34,6 @@
     <!--<style name="AppWelcome" parent="android:Theme.Translucent.NoTitleBar.Fullscreen"/>-->
 
     <style name="AppWelcome" parent="AppTheme">
-        <item name="android:windowBackground">@mipmap/background</item>
+        <item name="android:windowBackground">@mipmap/slogan</item>
     </style>
 </resources>

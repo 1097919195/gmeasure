@@ -1,4 +1,4 @@
-package com.npclo.imeasurer.account.forgetpwd;
+package com.npclo.imeasurer.account.forgetPwd;
 
 import com.npclo.imeasurer.base.BasePresenter;
 import com.npclo.imeasurer.base.BaseView;

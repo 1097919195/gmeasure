@@ -1,4 +1,4 @@
-package com.npclo.imeasurer.account.forgetpwd;
+package com.npclo.imeasurer.account.forgetPwd;
 
 import android.support.annotation.NonNull;
 
