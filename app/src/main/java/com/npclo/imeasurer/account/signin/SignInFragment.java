@@ -191,6 +191,7 @@ public class SignInFragment extends BaseFragment implements SignInContract.View 
 
         Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
+        getActivity().finish();
     }
 
     @Override

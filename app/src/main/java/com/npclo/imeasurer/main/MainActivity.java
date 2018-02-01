@@ -192,7 +192,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         .inputType(InputType.TYPE_CLASS_NUMBER)
                         .input(R.string.input_offset_hint, R.string.default_value, (dialog, offset) -> {
                             dialog.dismiss();
-                            PreferencesUtils.getInstance(this).setMeasureOffset(Float.parseFloat(offset.toString()));
+                            String s = offset.toString();
+                            float v = 0.0f;
+                            try {
+                                v = !TextUtils.isEmpty(s) ? Float.parseFloat(s) : 0.0f;
+                            } catch (NumberFormatException e) {
+                                v = 0.0f;
+                            }
+                            PreferencesUtils.getInstance(this).setMeasureOffset(v);
                         }).show();
                 drawerLayout.closeDrawers();
                 break;

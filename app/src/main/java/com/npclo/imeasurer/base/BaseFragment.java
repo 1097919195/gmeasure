@@ -63,8 +63,10 @@ public abstract class BaseFragment extends SupportFragment {
      */
     protected void navOfToolbar(Toolbar toolbar) {
         toolbar.setNavigationIcon(R.mipmap.left);
-        toolbar.setNavigationOnClickListener(view ->
-                startActivity(new Intent(getActivity(), MainActivity.class))
+        toolbar.setNavigationOnClickListener(view -> {
+                    startActivity(new Intent(getActivity(), MainActivity.class));
+                    getActivity().finish();
+                }
         );
     }
 
