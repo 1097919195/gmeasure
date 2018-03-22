@@ -20,8 +20,7 @@ public class SignInPresenter implements SignInContract.Presenter {
     @NonNull
     private CompositeSubscription mSubscriptions;
 
-    public SignInPresenter(@NonNull SignInContract.View signinView,
-                           @NonNull BaseSchedulerProvider schedulerProvider) {
+    public SignInPresenter(@NonNull SignInContract.View signinView, @NonNull BaseSchedulerProvider schedulerProvider) {
         mSchedulerProvider = checkNotNull(schedulerProvider);
         mSubscriptions = new CompositeSubscription();
         mView = checkNotNull(signinView);

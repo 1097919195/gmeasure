@@ -12,7 +12,7 @@ import com.npclo.imeasurer.base.BaseApplication;
  */
 
 public class SettingUtil {
-    private SharedPreferences setting = PreferenceManager.getDefaultSharedPreferences(BaseApplication.AppContext);
+    private SharedPreferences setting = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getAppContext);
 
     public static SettingUtil getInstance() {
         return SettingsUtilInstance.instance;
@@ -32,7 +32,7 @@ public class SettingUtil {
     }
 
     public int getColor() {
-        int defaultColor = BaseApplication.AppContext.getResources().getColor(R.color.primary);
+        int defaultColor = BaseApplication.getAppContext.getResources().getColor(R.color.primary);
         int color = setting.getInt("color", defaultColor);
         if ((color != 0) && Color.alpha(color) != 255) {
             return defaultColor;

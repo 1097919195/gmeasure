@@ -15,6 +15,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,6 +39,7 @@ import com.npclo.imeasurer.data.ThirdMember;
 import com.npclo.imeasurer.data.WechatUser;
 import com.npclo.imeasurer.data.measure.Item;
 import com.npclo.imeasurer.data.measure.Measurement;
+import com.npclo.imeasurer.data.measure.MessageEvent;
 import com.npclo.imeasurer.data.measure.Part;
 import com.npclo.imeasurer.data.measure.Result;
 import com.npclo.imeasurer.main.MainActivity;
@@ -68,6 +70,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import de.greenrobot.event.EventBus;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -175,6 +178,8 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @Override
     protected void initView(View mRootView) {
         unbinder = ButterKnife.bind(this, mRootView);
+        //注册EventBus
+        EventBus.getDefault().register(this);
         //初始化需要测量角度的部位
         angleList = initMeasureAnglePartsList();
         //渲染测量部位列表
@@ -334,10 +339,16 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
     @Override
     public void onPause() {
         super.onPause();
-        Gog.d("Measurement onPause");
         if (measurePresenter != null) {
             measurePresenter.unsubscribe();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //注销EventBus
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -345,6 +356,13 @@ public class MeasureFragment extends BaseFragment implements MeasureContract.Vie
         super.onDestroyView();
         if (speechSynthesizer != null) {
             speechSynthesizer = null;
+        }
+    }
+
+    //接受消息的地方(在Android的UI线程中)
+    public void onEventMainThread(MessageEvent event) {
+        if (event.getNum() == 1) {
+            Log.e("ahaha", "fragment====ahahah");
         }
     }
 

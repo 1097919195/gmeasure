@@ -44,7 +44,7 @@ public class HttpHelper {
 
     private void initHeader(OkHttpClient.Builder httpClientBuilder) {
         httpClientBuilder.addInterceptor(chain -> {
-            Context context = BaseApplication.AppContext;
+            Context context = BaseApplication.getAppContext;
             String jwt = PreferencesUtils.getInstance(context).getToken(false);
             Request original = chain.request();
             Request.Builder requestBuilder = original.newBuilder()

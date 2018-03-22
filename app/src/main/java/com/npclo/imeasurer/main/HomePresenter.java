@@ -71,6 +71,7 @@ public class HomePresenter implements HomeContract.Presenter {
         mSubscriptions.add(subscribe);
     }
 
+    //动态更新需要测量角度的部位
     private void getAnglePartsList() {
         Subscription subscribe = new MeasurementHelper()
                 .getAngleOfParts()
@@ -215,7 +216,7 @@ public class HomePresenter implements HomeContract.Presenter {
                 .observeOn(mSchedulerProvider.ui())
                 .doOnSubscribe(() -> fragment.showLoading(true))
                 .subscribe(app -> fragment.onGetVersionInfo(app, Constant.MANUAL),
-                        e -> fragment.onGetVersionError(e, Constant.MANUAL), () -> fragment.showLoading(false));
+                        e -> fragment.onGetVersionError(e, Constant.MANUAL));
         mSubscriptions.add(subscribe);
     }
 

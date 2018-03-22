@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,31 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 public abstract class BaseFragment extends SupportFragment {
     protected View mRootView;
     private Handler handler = new android.os.Handler();
+
+//    private static final String STATE_SAVE_IS_HIDDEN = "STATE_SAVE_IS_HIDDEN";
+//
+//    @Override
+//    public void onCreate(@Nullable Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        if (savedInstanceState != null) {
+//            boolean isSupportHidden = savedInstanceState.getBoolean(STATE_SAVE_IS_HIDDEN);
+//
+//            FragmentTransaction ft = getFragmentManager().beginTransaction();
+//            if (isSupportHidden) {
+//                ft.hide(this);
+//            } else {
+//                ft.show(this);
+//            }
+//            ft.commit();
+//        }
+//    }
+//
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putBoolean(STATE_SAVE_IS_HIDDEN, isHidden());
+//    }
+
 
     @Nullable
     @Override

@@ -31,11 +31,13 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".main.MainActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".account.AccountActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".camera.CaptureActivity"
             android:screenOrientation="portrait" />
@@ -56,6 +58,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".Service.MeasureServiceBind"
+            >
+        </service>
+
+        <receiver android:name=".BroadcastReceiver.MeasureBroadcastReceiver"
+            >
+
+        </receiver>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

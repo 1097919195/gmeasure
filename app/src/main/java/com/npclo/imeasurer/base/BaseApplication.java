@@ -17,7 +17,7 @@ import java.util.List;
 
 public class BaseApplication extends Application {
     private RxBleClient rxBleClient;
-    public static Context AppContext;
+    public static Context getAppContext;
     private List<Item> angleList;
 
     public static RxBleClient getRxBleClient(Context context) {
@@ -28,7 +28,7 @@ public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        AppContext = getApplicationContext();
+        getAppContext = getApplicationContext();
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.

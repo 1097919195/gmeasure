@@ -3,6 +3,7 @@ package com.npclo.imeasurer.camera;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -99,10 +100,18 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback 
             Toast.makeText(CaptureActivity.this, "帮助界面开发中", Toast.LENGTH_SHORT).show();
             return false;
         });
-        toolbar.setNavigationOnClickListener(v -> {
-            Intent intent = new Intent(CaptureActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+//        toolbar.setNavigationOnClickListener(v -> {
+//            Intent intent = new Intent(CaptureActivity.this, MainActivity.class);
+//            startActivity(intent);
+//            finish();
+//        }
+//        );
+        toolbar.setNavigationOnClickListener(view ->  {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                finishAfterTransition();
+            } else {
+                finish();
+            }
         });
     }
 

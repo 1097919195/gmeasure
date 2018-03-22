@@ -33,6 +33,7 @@ android {
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
                         //这里修改apk文件名
                         def fileName = "gmeasure-${defaultConfig.versionCode}-${defaultConfig.versionName}-${releaseTime()}.apk"
+                        output.outputFileName  = fileName//studio3.0中要这么写
 //                        output.outputFile = new File(outputFile.parent, fileName)
                     }
                 }
@@ -108,8 +109,9 @@ dependencies {
     compile 'com.blankj:utilcode:1.9.0'
     compile 'io.jsonwebtoken:jjwt:0.7.0'  //登录秘钥
     compile 'com.google.guava:guava:23.6-android'  //guava类似Apache Commons工具集
+    compile 'com.orhanobut:logger:1.13'
+    compile 'de.greenrobot:eventbus:2.4.0'
 
-    apply plugin: 'com.antfortune.freeline'
 }
 
 configurations.all {

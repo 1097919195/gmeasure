@@ -24,6 +24,7 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
 /**
  * @author Endless
+ * 更改密码界面
  */
 public class ManageFragment extends BaseFragment implements ManageContract.View {
     @BindView(R.id.support_frag_toolbar)

@@ -48,6 +48,8 @@ public final class PreferencesUtils {
     private static final String MEASURE_MEASURED = "measureMeasured";
     private static final String MEASURE_OFFSET = "measureOffset";
 
+    private static final String FIRST_START = "firstStart";
+
     private static PreferencesUtils sInstance;
 
     private static SharedPreferences mPreferences;
@@ -98,6 +100,12 @@ public final class PreferencesUtils {
     private void assign(String name, float value) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor.putFloat(name, value);
+        editor.apply();
+    }
+
+    private void assign(String name, boolean blo) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(name, blo);
         editor.apply();
     }
 
@@ -252,5 +260,13 @@ public final class PreferencesUtils {
 
     public void setMeasureOffset(float measureOffset) {
         assign(MEASURE_OFFSET, measureOffset);
+    }
+
+    public boolean getFirstStart() {
+        return mPreferences.getBoolean(FIRST_START, false);
+    }
+
+    public void setFirstStart(boolean first) {
+        assign(FIRST_START, first);
     }
 }

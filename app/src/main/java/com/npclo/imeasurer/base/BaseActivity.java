@@ -26,7 +26,7 @@ public abstract class BaseActivity extends SupportActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        initC();
+//        initC();
     }
 
     protected void initC() {

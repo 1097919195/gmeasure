@@ -1,6 +1,8 @@
 package com.npclo.imeasurer.main;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,6 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -21,15 +24,20 @@ import com.bumptech.glide.request.RequestOptions;
 import com.npclo.imeasurer.R;
 import com.npclo.imeasurer.base.BaseActivity;
 import com.npclo.imeasurer.base.BaseApplication;
+import com.npclo.imeasurer.data.App;
 import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.user.UserActivity;
 import com.npclo.imeasurer.utils.Constant;
+import com.npclo.imeasurer.utils.Gog;
 import com.npclo.imeasurer.utils.LogUtils;
 import com.npclo.imeasurer.utils.PreferencesUtils;
+import com.npclo.imeasurer.utils.ToastUtil;
 import com.npclo.imeasurer.utils.schedulers.SchedulerProvider;
 import com.npclo.imeasurer.utils.views.CircleImageView;
 import com.unisound.client.SpeechConstants;
 import com.unisound.client.SpeechSynthesizer;
+
+import kr.co.namee.permissiongen.PermissionGen;
 
 /**
  * @author Endless
@@ -83,6 +91,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             homePresenter = new HomePresenter(BaseApplication.getRxBleClient(this),
                     homeFragment, SchedulerProvider.getInstance());
         }
+
     }
 
     protected void initView() {
@@ -165,7 +174,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                             homePresenter.logout();
                         })
                         .show();
-                drawerLayout.closeDrawers();
                 break;
             case R.id.nav_instruction:
                 drawerLayout.closeDrawers();
@@ -207,7 +215,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                             }
                             instance.setMeasureOffset(v);
                         }).show();
-                drawerLayout.closeDrawers();
                 break;
             case R.id.nav_contract:
                 new MaterialDialog.Builder(this)
@@ -221,22 +228,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         .onNegative((dialog, action) -> homePresenter.getThirdOrgDefaultParts(instance.getUserOrgid())
                         )
                         .show();
-                drawerLayout.closeDrawers();
                 break;
             case R.id.nav_account:
-                drawerLayout.closeDrawers();
                 Intent pwdIntent = new Intent(this, UserActivity.class);
                 pwdIntent.putExtra("support_type", Constant.USER_PWD);
                 startActivity(pwdIntent);
                 break;
             case R.id.nav_feedback:
-                drawerLayout.closeDrawers();
                 Intent feedbackIntent = new Intent(this, UserActivity.class);
                 feedbackIntent.putExtra("support_type", Constant.USER_FEEDBACK);
                 startActivity(feedbackIntent);
                 break;
             case R.id.nav_link:
-                drawerLayout.closeDrawers();
                 Intent contactIntent = new Intent(this, UserActivity.class);
                 contactIntent.putExtra("support_type", Constant.USER_CONTACT);
                 startActivity(contactIntent);
@@ -270,6 +273,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else {
             logoView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
+    }
+
+    @Override
+    public void onBackPressedSupport() {
+        if (drawerLayout.isDrawerOpen(navView)){
+            drawerLayout.closeDrawers();
+            return;
+        }
+        super.onBackPressedSupport();
     }
 
     @Override

@@ -22,6 +22,7 @@ import com.npclo.imeasurer.base.BaseFragment;
 import com.npclo.imeasurer.data.User;
 import com.npclo.imeasurer.main.MainActivity;
 import com.npclo.imeasurer.utils.Constant;
+
 import com.npclo.imeasurer.utils.LoadingTip;
 import com.npclo.imeasurer.utils.PreferencesUtils;
 
@@ -216,8 +217,7 @@ public class SignInFragment extends BaseFragment implements SignInContract.View 
 
     @Override
     public void showSignInError(Throwable e) {
-        loadingTip.setLoadingTip(LoadingTip.LoadStatus.finish);
-//        signInLoadingDialog.dismiss();
+        showLoading(false);
         onHandleError(e);
     }
 

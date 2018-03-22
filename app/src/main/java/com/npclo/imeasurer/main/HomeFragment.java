@@ -2,13 +2,13 @@ package com.npclo.imeasurer.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -25,9 +25,10 @@ import com.npclo.imeasurer.data.measure.Contract;
 import com.npclo.imeasurer.data.measure.Item;
 import com.npclo.imeasurer.measure.MeasureActivity;
 import com.npclo.imeasurer.utils.Constant;
-import com.npclo.imeasurer.utils.LoadingTip;
+import com.npclo.imeasurer.utils.Gog;
 import com.npclo.imeasurer.utils.LogUtils;
 import com.npclo.imeasurer.utils.PreferencesUtils;
+import com.npclo.imeasurer.utils.SPUtils;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.scan.ScanResult;
@@ -67,8 +68,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     private MaterialDialog cirProgressBar;
     private MaterialDialog resultDialog;
 
-    @BindView(R.id.loadedTip)
-    LoadingTip loadingTip;
+    boolean currentDayFirst;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -122,14 +122,16 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         startActivityForResult(intent, REQUEST_CODE_WECHATUSER);
     }
 
+    // FIXME 待删除
     @Override
     public void onResume() {
         super.onResume();
         if (mPresenter != null) {
             mPresenter.subscribe();
         }
-        boolean currentDayFirst = PreferencesUtils.getInstance(getActivity()).isCurrentDayFirst(getTodayStr());
-        if (currentDayFirst) {
+
+//        currentDayFirst = PreferencesUtils.getInstance(getActivity()).isCurrentDayFirst(getTodayStr());
+        if (isToday()) {
             mPresenter.autoGetLatestVersion();
         }
         LogUtils.upload(getActivity());
@@ -138,10 +140,10 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     @Override
     public void onPause() {
         super.onPause();
-        // FIXME: 06/01/2018 哪里触发了导致系统调用这个方法
         if (mPresenter != null) {
             mPresenter.unsubscribe();
         }
+
     }
 
     @Override
@@ -157,18 +159,14 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     @Override
     public void showLoading(boolean bool) {
-//        if (bool) {
-//            cirProgressBar = new MaterialDialog.Builder(getActivity())
-//                    .progress(true, 100)
-//                    .backgroundColor(getResources().getColor(R.color.white))
-//                    .show();
-//        } else {
-//            cirProgressBar.dismiss();
-//        }
         if (bool) {
-            loadingTip.setLoadingTip(LoadingTip.LoadStatus.loading);
-        }else{
-            loadingTip.setLoadingTip(LoadingTip.LoadStatus.finish);
+            cirProgressBar = new MaterialDialog.Builder(getActivity())
+                    .progress(true, 100)
+                    .content("请稍等...")
+                    .backgroundColor(getResources().getColor(R.color.white))
+                    .show();
+        } else {
+            cirProgressBar.dismiss();
         }
     }
 
@@ -203,7 +201,7 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     public void onGetVersionInfo(App app, String type) {
         int code = getVersionCode();
         if (Constant.AUTO.equals(type)) {
-            PreferencesUtils.getInstance(getActivity()).setCurrentDate(getTodayStr());
+            saveMsg();//记录自动更新时间
         }
         if (app.getCode() > code && code != 0) {
             updateApp(app);
@@ -214,20 +212,23 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         }
     }
 
-    @NonNull
-    private String getTodayStr() {
-        Calendar instance = Calendar.getInstance();
-        String year = String.valueOf(instance.get(Calendar.YEAR));
-        String month = String.valueOf(instance.get(Calendar.MONTH) + 1);
-        String day = String.valueOf(instance.get(Calendar.DAY_OF_MONTH));
-        return year + month + day;
-    }
+//    @NonNull
+//    private String getTodayStr() {
+//        Calendar instance = Calendar.getInstance();
+//        String year = String.valueOf(instance.get(Calendar.YEAR));
+//        String month = String.valueOf(instance.get(Calendar.MONTH) + 1);
+//        String day = String.valueOf(instance.get(Calendar.DAY_OF_MONTH));
+//        return year + month + day;
+//    }
 
     @Override
     public void onGetVersionError(Throwable e, String type) {
-        if (type.equals(Constant.MANUAL)) {
-            showLoading(false);
-        }
+//        if (type.equals(Constant.MANUAL)) {
+//            showLoading(false);
+//            onCloseScanResultDialog();
+//        }
+        onCloseScanResultDialog();
+        showLoading(false);
         onHandleError(e);
     }
 
@@ -244,20 +245,18 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         }, 500);
     }
 
+    //管理扫描结果界面
     @Override
     public void onHandleScanResult(ScanResult result) {
-//        if (cirProgressBar != null) {
-//            cirProgressBar.dismiss();
-//            cirProgressBar = null;
-//        }
-        loadingTip.setLoadingTip(LoadingTip.LoadStatus.finish);
         RxBleDevice device = result.getBleDevice();
         if (resultDialog == null) {
             resultDialog = scanResultDialog.show();
         }
         if (!resultDialog.isShowing()) {
+            configureResultList();//这样才能边扫描边显示
             resultDialog.show();
         }
+
         if (!rxBleDeviceAddressList.contains(device.getMacAddress())) {
             rxBleDeviceAddressList.add(device.getMacAddress());
             bleDeviceList.add(new BleDevice(device.getName(), device.getMacAddress(), result.getRssi()));
@@ -265,20 +264,15 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
         }
     }
 
-    @Override
-    public void onShowError(String s) {
-        showToast(s);
-    }
-
     private void configureResultList() {
         scanResultsAdapter = new ScanResultsAdapter(this, bleDeviceList);
+
         scanResultDialog = new MaterialDialog.Builder(getActivity())
                 .title(R.string.choose_device_prompt)
                 .backgroundColor(getResources().getColor(R.color.white))
                 .titleColor(getResources().getColor(R.color.scan_result_list_title))
                 .dividerColor(getResources().getColor(R.color.divider))
                 .adapter(scanResultsAdapter, null);
-        ;
         //选择目的蓝牙设备
         scanResultsAdapter.setOnAdapterItemClickListener(v -> {
                     String s = ((TextView) v.findViewById(R.id.txt_mac)).getText().toString();
@@ -288,38 +282,56 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     }
 
     @Override
+    public void onShowError(String s) {
+        showLoading(false);
+        showToast(s);
+    }
+
+    @Override
     public void onHandleBleScanException(BleScanException e) {
         switch (e.getReason()) {
             case BleScanException.BLUETOOTH_NOT_AVAILABLE:
+                showLoading(false);
                 showToast(getString(R.string.bluetooth_not_avavilable));
                 break;
             case BleScanException.BLUETOOTH_DISABLED:
+                showLoading(false);
                 showToast(getString(R.string.bluetooth_disabled));
                 break;
             case BleScanException.LOCATION_PERMISSION_MISSING:
+                showLoading(false);
                 showToast("未授予获取位置权限");
                 break;
             case BleScanException.LOCATION_SERVICES_DISABLED:
+                showLoading(false);
                 showToast("6.0以上手机需要开启位置服务");
                 break;
             case BleScanException.SCAN_FAILED_ALREADY_STARTED:
+                showLoading(false);
                 showToast("Scan with the same filters is already started");
                 break;
             case BleScanException.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED:
+                showLoading(false);
                 showToast("Failed to register application for bluetooth scan");
                 break;
             case BleScanException.SCAN_FAILED_FEATURE_UNSUPPORTED:
+                showLoading(false);
                 showToast("Scan with specified parameters is not supported");
                 break;
             case BleScanException.SCAN_FAILED_INTERNAL_ERROR:
+                showLoading(false);
                 showToast("Scan failed due to internal error");
                 break;
             case BleScanException.SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES:
+                showLoading(false);
                 showToast("Scan cannot start due to limited hardware resources");
                 break;
             case BleScanException.UNKNOWN_ERROR_CODE:
+                showLoading(false);
             case BleScanException.BLUETOOTH_CANNOT_START:
+                showLoading(false);
             default:
+                showLoading(false);
                 showToast("不能够扫描外接蓝牙设备");
                 break;
         }
@@ -340,12 +352,18 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     @Override
     public void onDeviceChoose(RxBleDevice bleDevice) {
-        showToast(getString(R.string.device_connected));
-        getSynthesizer().playText("蓝牙连接成功");
-        setBleDeviceName(bleDevice.getName());
-        setBleAddress(bleDevice.getMacAddress());
-        //更新设备连接信息状态 //TODO: 23/01/2018  使用R'xBus
-        ((MainActivity) getActivity()).updateBlueToothState(bleDevice.getName());
+        try {
+            showLoading(false);
+            showToast(getString(R.string.device_connected));
+            getSynthesizer().playText("蓝牙连接成功");
+            setBleDeviceName(bleDevice.getName());
+            setBleAddress(bleDevice.getMacAddress());
+            //更新设备连接信息状态 //TODO: 23/01/2018  使用R'xBus
+            ((MainActivity) getActivity()).updateBlueToothState(bleDevice.getName());
+        } catch (Exception e) {
+            showLoading(false);
+            Gog.e(e.toString());
+        }
     }
 
     @Override
@@ -484,21 +502,25 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
 
     @Override
     public void onGetAngleOfPartsError(Throwable e) {
+        showLoading(false);
         onHandleError(e);
     }
 
     @Override
     public void onUpdateUserInfoError(Throwable e) {
+        showLoading(false);
         onHandleError(e);
     }
 
     @Override
     public void onHandleUnknownError(Throwable e) {
+        showLoading(false);
         onHandleError(e);
     }
 
     @Override
     public void onHandleConnectError(Throwable e) {
+        showLoading(false);
         onHandleError(e);
     }
 
@@ -534,5 +556,60 @@ public class HomeFragment extends BaseFragment implements HomeContract.View {
     public void showGetContractInfoError(Throwable e) {
         showLoading(false);
         onHandleError(e);
+    }
+
+
+
+    /**
+     * 判断是否是同一天
+     * 是同一天返回false
+     *
+     * @return
+     */
+    private boolean isToday() {
+        Time t = new Time(); // or Time t=new Time("GMT+8"); 加上Time Zone资料
+        t.setToNow(); // 取得系统时间。
+        int year = t.year;
+        int month = t.month;
+        int date = t.monthDay;
+        int minute = t.minute;
+        int oldminute = SPUtils.getSharedIntData(BaseApplication.getAppContext,"minute");
+        int oldyear = SPUtils.getSharedIntData(BaseApplication.getAppContext,"year");
+        int oldmonth = SPUtils.getSharedIntData(BaseApplication.getAppContext,"month");
+        int olddate = SPUtils.getSharedIntData(BaseApplication.getAppContext,"date");
+        Log.e("Tag",String.valueOf(olddate));
+        Log.e("Tag",String.valueOf(date));
+        saveMsg();
+
+        //the first
+        if (oldminute == -1 || oldyear == -1 || oldmonth == -1 || olddate == -1) {
+            return true;
+        }
+        if (oldyear < year) {
+            return true;
+        } else if (oldmonth < month) {
+            return true;
+        } else if (olddate < date) {
+            return true;
+        }
+//        else if (oldminute < minute) {
+//            return true;
+//        }
+        else {
+            return false;
+        }
+    }
+
+    private void saveMsg() {
+        Time t = new Time(); // or Time t=new Time("GMT+8"); 加上Time Zone资料
+        t.setToNow(); // 取得系统时间。
+        int year = t.year;
+        int month = t.month;
+        int date = t.monthDay;
+        int minute = t.minute;
+        SPUtils.setSharedIntData(BaseApplication.getAppContext,"year", year);
+        SPUtils.setSharedIntData(BaseApplication.getAppContext,"month", month);
+        SPUtils.setSharedIntData(BaseApplication.getAppContext,"date", date);
+        SPUtils.setSharedIntData(BaseApplication.getAppContext,"minute", minute);
     }
 }
